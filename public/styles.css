@@ -1,0 +1,138 @@
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    line-height: 1.6;
+}
+
+/* Main Promo Section */
+.main-promo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 50px 20px;
+    background-color: #e5e5e5;
+    color: #fff;
+}
+
+.product-image img {
+    max-width: 500px;  /* Adjust the image size */
+    height: auto;
+    border-radius: 10px;
+}
+
+.promo-text {
+    max-width: 50%;
+}
+
+.promo-text h1 {
+    font-size: 48px;
+    font-weight: bold;
+    color: #1a73e8;
+}
+
+.promo-text h2 {
+    font-size: 36px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.promo-text p {
+    font-size: 20px;
+    margin: 15px 0;
+}
+
+.promo-text button {
+    padding: 10px 20px;
+    background-color: #1a73e8;
+    color: white;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.promo-text button:hover {
+    background-color: #0c55b2;
+}
+
+/* Additional Images Section */
+.additional-images {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 50px 20px;
+    background-color: #fff;
+    border-top: 2px solid #ddd;
+}
+
+.image-item {
+    text-align: center;
+    position: relative;
+}
+
+/* Adjust the position of the images to the left */
+.image-item img {
+    width: 100px;
+    height: auto;
+    margin-bottom: 15px;
+    margin-left: -10px;  /* Move the image slightly to the left */
+}
+
+.image-item p {
+    font-size: 22px;   /* Increased font size */
+    font-weight: bold; /* Make the text bold */
+    color: #333;
+    margin-top: 10px;
+    letter-spacing: 1px; /* Slight spacing for better readability */
+}
+
+/* Vertical line between images */
+.image-item:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: -15px; /* Adds space from the image */
+    top: 0;
+    bottom: 0;
+    width: 2px; /* Width of the vertical line */
+    background-color: #ddd; /* Line color */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-promo {
+        flex-direction: column;
+        text-align: center;
+        height: auto;
+        padding: 30px;
+    }
+
+    .promo-text {
+        max-width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .promo-text h1 {
+        font-size: 32px;
+    }
+
+    .additional-images {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .image-item {
+        margin-bottom: 20px;
+        position: static;
+    }
+
+    .image-item:not(:last-child)::after {
+        display: none; /* Hide vertical lines on mobile */
+    }
+}

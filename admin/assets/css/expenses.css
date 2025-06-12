@@ -1,0 +1,270 @@
+/* General Body Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background-color: #f4f4f9;
+  color: #333;
+  line-height: 1.6;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: 270px;
+  background-color: rgb(10, 10, 30);
+  color: white;
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.sidebar nav a {
+  display: block;
+  color: #ecf0f1;
+  text-decoration: none;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.sidebar nav a:hover {
+  background-color: rgba(255, 255, 255, 0.058);
+  border-left: 4px solid #3498db; /* Blue left border for active state */
+  padding-left: 10px;
+}
+
+.sidebar nav a.active {
+  background-color: #08427b;
+}
+
+/* Main Content */
+.main-content {
+  width: 91%;
+  padding: 20px;
+  background-color: #fff;
+}
+.content{
+    max-height: 630px;
+    overflow-y: auto;
+}
+.content1{
+    max-height: 700px;
+    overflow-y: auto;
+}
+/* Header Styles */
+.title{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right:30px ;
+    padding-top: 20px;
+    padding-bottom: 30px;
+}
+.title a{
+    color: #fffcfc;
+    background-color: #3498db;
+    border-radius: 10px;
+    padding: 10px 15px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+.title a:hover{
+    background-color:#2980b9 ;
+}
+.top-bar{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.top-bar a{
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    gap: 5px;
+    cursor: pointer;
+    color: rgba(255, 0, 0, 0.632);
+    transition: all 0.3s ease;
+}
+.top-bar a:hover{
+    color: rgb(255, 0, 0);
+}
+/* Table Styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+table th,
+table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+  font-size: 1rem;
+}
+
+table th {
+  background-color: #3498db;
+  color: white;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+table tr:hover {
+  background-color: #f1f8f1;
+}
+
+/* Form Styles */
+form {
+    border: 1px solid rgba(164, 164, 164, 0.301);
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 8px;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  resize: none;
+}
+
+button {
+  background-color: #3498db;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+}
+
+/* Alert Styles */
+.alert {
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.alert-success {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.alert-error {
+  background-color: #e74c3c;
+  color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+
+  header.top-bar {
+    font-size: 1.2rem;
+  }
+
+  table th,
+  table td {
+    font-size: 0.9rem;
+  }
+
+  .sidebar nav a {
+    font-size: 0.9rem; /* Adjusted for mobile */
+  }
+}
+
+.actions a {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+.edit{
+    background-color: #F7BB07;
+    padding: 2px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    color: #000000;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+.edit:hover{
+    background-color: #e9af01;
+}
+.delete{
+    background-color: #FF0000;
+    padding: 2px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    color: #000000;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+.delete:hover{
+  background-color: #e90000;
+}

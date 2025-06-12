@@ -1,0 +1,123 @@
+/* Invoice Styles */
+.invoice-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border-radius: 5px;
+}
+
+.invoice-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.invoice-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1a1a1a;
+}
+
+.invoice-details, .customer-details {
+    margin-bottom: 20px;
+}
+
+.invoice-details div, .customer-details div {
+    margin-bottom: 5px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f8f8f8;
+}
+
+.totals {
+    width: 50%;
+    margin-left: auto;
+}
+
+.totals table {
+    width: 100%;
+}
+
+.totals table td {
+    border: none;
+    padding: 5px;
+}
+
+.totals table tr.grand-total {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.footer {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+    text-align: center;
+    font-size: 0.9em;
+    color: #777;
+}
+
+.company-info {
+    text-align: right;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.action-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.action-button.secondary {
+    background-color: #6c757d;
+}
+
+.action-button:hover {
+    background-color: #45a049;
+}
+
+.action-button.secondary:hover {
+    background-color: #5a6268;
+}
+
+@media print {
+    .no-print, .action-buttons {
+        display: none;
+    }
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    .invoice-container {
+        box-shadow: none;
+        border: none;
+    }
+}
