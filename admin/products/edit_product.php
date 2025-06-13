@@ -194,9 +194,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="form-group">
                         <label for="category"><i class="fas fa-tags"></i> Category:</label>
                         <select id="category" name="category" required>
-                            <option value="ladies" <?= $product['category'] === 'ladies' ? 'selected' : '' ?>>Ladies Shoes</option>
-                            <option value="kids" <?= $product['category'] === 'kids' ? 'selected' : '' ?>>Kids Shoes</option>
-                            <option value="gents" <?= $product['category'] === 'gents' ? 'selected' : '' ?>>Gents Shoes</option>
+                            <option value="Ladies" <?= $product['category'] === 'ladies' ? 'selected' : '' ?>>Ladies Shoes</option>
+                            <option value="Kids" <?= $product['category'] === 'kids' ? 'selected' : '' ?>>Kids Shoes</option>
+                            <option value="Gents" <?= $product['category'] === 'gents' ? 'selected' : '' ?>>Gents Shoes</option>
                         </select>
                     </div>
 
