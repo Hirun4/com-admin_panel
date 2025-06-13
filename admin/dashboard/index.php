@@ -257,7 +257,7 @@ try {
                     <h2>Total Revenue for <?= $formattedDate ?></h2>
                     <p>Rs. <?= number_format($totalRevenue, 2) ?></p>
                 </div>
-                // Order Request Card
+                
                 <div class="stat" id="orderRequestCard" style="cursor:pointer; background:#f1c40f;">
                     <h2>Order Requests</h2>
                     <p id="orderRequestCount"><?= $orderRequestCount ?></p>
