@@ -20,7 +20,7 @@ try {
     $stmtOrder = $pdo->prepare("SELECT * FROM orders WHERE order_id = :order_id");
     $stmtOrder->execute([':order_id' => $order_id]);
     $order = $stmtOrder->fetch(PDO::FETCH_ASSOC);
-
+    // print_r($order);
     if (!$order) {
         die("Order not found.");
     }
@@ -28,6 +28,7 @@ try {
     $stmtOrderItems = $pdo->prepare("SELECT * FROM order_items WHERE order_id = :order_id");
     $stmtOrderItems->execute([':order_id' => $order_id]);
     $order_items = $stmtOrderItems->fetchAll(PDO::FETCH_ASSOC);
+    print_r($order_items);
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Update the orders table
@@ -223,6 +224,10 @@ try {
                             <div class="form-group">
                                 <label for="quantity_<?= $index ?>"><i class="fas fa-sort-numeric-up"></i> Quantity</label>
                                 <input type="number" id="quantity_<?= $index ?>" name="products[<?= $index ?>][quantity]" value="<?= htmlspecialchars($item['quantity']) ?>">
+                            </div>
+                            <div class="form-group">
+                                <label for="buying_price_code_<?= $index ?>"><i class="fas fa-code"></i> Co Code</label>
+                                <input type="text" id="buying_price_code_<?= $index ?>" name="products[<?= $index ?>][buying_price_code]" value="<?= htmlspecialchars($item['buying_price_code'] ?? '') ?>">
                             </div>
                             <div class="form-group">
                                 <label for="buying_price_code_<?= $index ?>"><i class="fas fa-code"></i> Buying Price Code</label>

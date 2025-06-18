@@ -33,10 +33,55 @@ try {
         $stmt->bindParam(':endDate', $endDate);
         $stmt->execute();
         $stats[$method] = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $stmt = $pdo->prepare("
+        SELECT 
+            SUM(oi.final_price) AS total_income,
+            SUM(oi.final_price - (SELECT pc.buying_price FROM product_codes pc WHERE pc.code = oi.buying_price_code)*oi.quantity) AS profit
+        FROM orders o
+        JOIN order_items oi ON o.order_id = oi.order_id
+        WHERE o.delivery_method = 'Home' AND DATE(o.created_at) = :dateFilter
+    ");
+    $stmt->bindParam(':dateFilter', $dateFilter);
+    $stmt->execute();
+    $homeStats = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $stmt = $pdo->prepare("
+        SELECT 
+            SUM(oi.final_price) AS total_income,
+            SUM(oi.final_price - (SELECT pc.buying_price FROM product_codes pc WHERE pc.code = oi.buying_price_code)*oi.quantity) AS profit
+        FROM orders o
+        JOIN order_items oi ON o.order_id = oi.order_id
+        WHERE o.delivery_method = 'Courier' AND DATE(o.created_at) = :dateFilter
+    ");
+    $stmt->bindParam(':dateFilter', $dateFilter);
+    $stmt->execute();
+    $courierStats = $stmt->fetch(PDO::FETCH_ASSOC);
     }
 } catch (PDOException $e) {
     die("Error: " . $e->getMessage());
 }
+
+// Total Revenue for the month
+$stmt = $pdo->prepare("
+    SELECT SUM(oi.final_price) AS total_revenue 
+    FROM orders o
+    JOIN order_items oi ON o.order_id = oi.order_id
+    WHERE o.created_at BETWEEN :startDate AND :endDate
+");
+$stmt->execute([':startDate' => $startDate, ':endDate' => $endDate]);
+$totalRevenue = $stmt->fetch(PDO::FETCH_ASSOC)['total_revenue'] ?? 0;
+
+// Total Profit for the month
+$stmt = $pdo->prepare("
+    SELECT 
+        SUM(oi.final_price - (SELECT pc.buying_price FROM product_codes pc WHERE pc.code = oi.buying_price_code)*oi.quantity) AS total_profit
+    FROM orders o
+    JOIN order_items oi ON o.order_id = oi.order_id
+    WHERE o.created_at BETWEEN :startDate AND :endDate
+");
+$stmt->execute([':startDate' => $startDate, ':endDate' => $endDate]);
+$totalProfit = $stmt->fetch(PDO::FETCH_ASSOC)['total_profit'] ?? 0;
 ?>
 
 <!DOCTYPE html>
@@ -127,6 +172,13 @@ try {
                     </tbody>
                 </table>
             </section>
+            
+
+            <!-- Monthly Totals -->
+            <div class="monthly-stats">
+                <h2>Total Revenue for <?= date('F Y', strtotime($startDate)) ?>: Rs. <?= number_format($totalRevenue, 2) ?></h2>
+                <h2>Total Profit for <?= date('F Y', strtotime($startDate)) ?>: Rs. <?= number_format($totalProfit, 2) ?></h2>
+            </div>
         </main>
     </div>
 </body>

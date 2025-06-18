@@ -26,6 +26,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $phone_number2 = ($delivery_method === 'Courier') ? ($_POST['phone_number2'] ?? '') : null;
     $district = $_POST['district'] ?? '';
     $delivery_fee = $_POST['delivery_fee'] ?? 0.00;
+    if ($delivery_fee === '' || $delivery_fee === null) {
+        $delivery_fee = 0.00;
+    }
     $status = $_POST['status'] ?? 'Pending';
     $return_reason = ($status === 'Returned') ? $_POST['return_reason'] ?? '' : null;
     $products = $_POST['products'] ?? [];
@@ -64,8 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Prepare statements for order items and stock updates
             $stmtOrderItems = $pdo->prepare("
-                INSERT INTO order_items (order_id, product_id, origin_country, size, quantity, buying_price_code, buying_price, selling_price, discount, promo_price, final_price, phone_number)
-                VALUES (:order_id, :product_id, :origin_country, :size, :quantity, :buying_price_code, :buying_price, :selling_price, :discount, :promo_price, :final_price, :phone_number)
+                INSERT INTO order_items (order_id, product_id, origin_country, size, quantity, buying_price_code, buying_price, selling_price, discount, promo_price, final_price, phone_number, co_code)
+                VALUES (:order_id, :product_id, :origin_country, :size, :quantity, :buying_price_code, :buying_price, :selling_price, :discount, :promo_price, :final_price, :phone_number, :co_code)
             ");
             $stmtUpdateStock = $pdo->prepare("
                 UPDATE product_stock 
@@ -118,6 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':promo_price' => $promo_price,
                     ':final_price' => $final_price,
                     ':phone_number' => $phone_number,
+                    ':co_code' => $product['co_code'] ?? null, // <-- Add this line
                 ]);
                 $stmtUpdateStock->execute([
                     ':quantity' => $product['quantity'],

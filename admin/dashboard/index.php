@@ -199,6 +199,15 @@ try {
 } catch (PDOException $e) {
     $orderRequestCount = 0;
 }
+
+// Fetch count of refund requests (only PENDING)
+try {
+    $stmt = $pdo->prepare("SELECT COUNT(*) AS refund_count FROM refund_requests WHERE status = 'PENDING'");
+    $stmt->execute();
+    $refundRequestCount = $stmt->fetch(PDO::FETCH_ASSOC)['refund_count'];
+} catch (PDOException $e) {
+    $refundRequestCount = 0;
+}
 ?>
 
 <!DOCTYPE html>
@@ -262,6 +271,11 @@ try {
                     <h2>Order Requests</h2>
                     <p id="orderRequestCount"><?= $orderRequestCount ?></p>
                 </div>
+
+                <div class="stat" id="refundRequestCard" style="cursor:pointer; background:#e67e22;">
+                    <h2>Refund Requests</h2>
+                    <p id="refundRequestCount"><?= $refundRequestCount ?></p>
+                </div>
             </section>
 
             <!-- Modal for order request details -->
@@ -270,6 +284,15 @@ try {
                     <button onclick="closeOrderRequestModal()" style="position:absolute; top:10px; right:10px;">&times;</button>
                     <h2>Order Requests Details</h2>
                     <div id="orderRequestDetails">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Modal for refund request details -->
+            <div id="refundRequestModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+                <div style="background:#fff; padding:30px; border-radius:8px; max-width:900px; width:95%; max-height:85vh; overflow:auto; position:relative;">
+                    <button onclick="closeRefundRequestModal()" style="position:absolute; top:10px; right:10px;">&times;</button>
+                    <h2>Refund Requests Details</h2>
+                    <div id="refundRequestDetails">Loading...</div>
                 </div>
             </div>
 
@@ -293,28 +316,19 @@ try {
 
 
             <section class="dashboard-revenue-profit" style="margin-top: 50px; display: flex; justify-content: space-between; flex-wrap: wrap;">
-                <div class="revenue-column">
-                    <div class="revenue-item">
-                        <h2>Total Profit (Home) on <?= htmlspecialchars($dateFilter) ?></h2>
-                        <p>Rs. <?= number_format($homeStats['profit'], 2) ?></p>
-                    </div>
-                    <div class="revenue-item">
-                        <h2>Total Revenue (Home) on <?= htmlspecialchars($dateFilter) ?></h2>
-                        <p>Rs. <?= number_format($homeStats['total_income'], 2) ?></p>
-                    </div>
-                </div>
-
-                <div class="revenue-column">
-                    <div class="revenue-item">
-                        <h2>Total Profit (Courier) on <?= htmlspecialchars($dateFilter) ?></h2>
-                        <p>Rs. <?= number_format($courierStats['profit'], 2) ?></p>
-                    </div>
-                    <div class="revenue-item">
-                        <h2>Total Revenue (Courier) on <?= htmlspecialchars($dateFilter) ?></h2>
-                        <p>Rs. <?= number_format($courierStats['total_income'], 2) ?></p>
-                    </div>
-                </div>
-            </section>
+    <div class="revenue-column">
+        <div class="revenue-item">
+            <h2>Total Revenue (Home) on <?= htmlspecialchars($dateFilter) ?></h2>
+            <p>Rs. <?= number_format($homeStats['total_income'], 2) ?></p>
+        </div>
+    </div>
+    <div class="revenue-column">
+        <div class="revenue-item">
+            <h2>Total Revenue (Courier) on <?= htmlspecialchars($dateFilter) ?></h2>
+            <p>Rs. <?= number_format($courierStats['total_income'], 2) ?></p>
+        </div>
+    </div>
+</section>
 
             <section class="expenses-table" style="margin-top: 50px;">
                 <h2>Expense Records</h2>
@@ -562,6 +576,20 @@ try {
         }
     </script>
     <script>
+        document.getElementById('refundRequestCard').onclick = function() {
+            document.getElementById('refundRequestModal').style.display = 'flex';
+            fetch('refund_request_details.php')
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById('refundRequestDetails').innerHTML = html;
+                });
+        };
+
+        function closeRefundRequestModal() {
+            document.getElementById('refundRequestModal').style.display = 'none';
+        }
+    </script>
+    <script>
         document.addEventListener('click', function(e) {
             // Accept
             if (e.target.classList.contains('accept-btn')) {
@@ -597,6 +625,46 @@ try {
                             alert(msg);
                             document.getElementById('orderRequestCard').click(); // Refresh modal
                         });
+                }
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener('click', function(e) {
+            // Accept refund
+            if (e.target.classList.contains('accept-refund-btn')) {
+                const id = e.target.getAttribute('data-id');
+                const orderId = e.target.getAttribute('data-order-id');
+                const refundAmount = e.target.getAttribute('data-amount');
+                if (confirm('Are you sure you want to approve this refund request?')) {
+                    fetch('refund_request_action.php', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                        body: 'action=accept&id=' + encodeURIComponent(id) + '&order_id=' + encodeURIComponent(orderId) + '&refund_amount=' + encodeURIComponent(refundAmount)
+                    })
+                    .then(res => res.text())
+                    .then(msg => {
+                        alert(msg);
+                        document.getElementById('refundRequestCard').click(); // Refresh modal
+                        location.reload(); // Optionally refresh dashboard stats
+                    });
+                }
+            }
+            // Reject refund
+            if (e.target.classList.contains('reject-refund-btn')) {
+                const id = e.target.getAttribute('data-id');
+                if (confirm('Are you sure you want to reject this refund request?')) {
+                    fetch('refund_request_action.php', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                        body: 'action=reject&id=' + encodeURIComponent(id)
+                    })
+                    .then(res => res.text())
+                    .then(msg => {
+                        alert(msg);
+                        document.getElementById('refundRequestCard').click(); // Refresh modal
+                        location.reload(); // Optionally refresh dashboard stats
+                    });
                 }
             }
         });

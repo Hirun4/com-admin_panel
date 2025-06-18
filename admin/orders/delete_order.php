@@ -3,43 +3,51 @@ session_start();
 include_once '../config/config.php';
 
 if (!isset($_SESSION['admin_logged_in'])) {
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'Unauthorized']);
+    header("Location: ../auth/login.php");
     exit;
 }
 
-if (!isset($_GET['phone_number']) || empty($_GET['phone_number'])) {
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'Phone number is required']);
-    exit;
-}
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $order_id = $_POST['order_id'] ?? '';
 
-$phoneNumber = $_GET['phone_number'];
+    if ($order_id) {
+        try {
+            $pdo->beginTransaction();
 
-try {
-    // Check if the phone number exists in previous orders and has a promo price
-    $stmt = $pdo->prepare("
-        SELECT SUM(promo_price) as total_promo_price 
-        FROM order_items 
-        WHERE phone_number = :phone_number
-    ");
-    $stmt->execute([':phone_number' => $phoneNumber]);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if ($result && $result['total_promo_price'] > 0) {
-        header('Content-Type: application/json');
-        echo json_encode([
-            'exists' => true,
-            'promo_price' => $result['total_promo_price']
-        ]);
+            // 1. Fetch all order items for this order
+            $stmt = $pdo->prepare("SELECT product_id, size, quantity FROM order_items WHERE order_id = :order_id");
+            $stmt->execute([':order_id' => $order_id]);
+            $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 2. Restock each product/size
+            $updateStock = $pdo->prepare("UPDATE product_stock SET quantity = quantity + :quantity WHERE product_id = :product_id AND size = :size");
+            foreach ($items as $item) {
+                $updateStock->execute([
+                    ':quantity' => $item['quantity'],
+                    ':product_id' => $item['product_id'],
+                    ':size' => $item['size'],
+                ]);
+            }
+
+            // 3. Delete order items
+            $stmt = $pdo->prepare("DELETE FROM order_items WHERE order_id = :order_id");
+            $stmt->execute([':order_id' => $order_id]);
+
+            // 4. Delete the order itself
+            $stmt = $pdo->prepare("DELETE FROM orders WHERE order_id = :order_id");
+            $stmt->execute([':order_id' => $order_id]);
+
+            $pdo->commit();
+
+            header("Location: manage_orders.php?msg=Order+deleted+and+stock+restocked");
+            exit;
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            die("Error: " . $e->getMessage());
+        }
     } else {
-        header('Content-Type: application/json');
-        echo json_encode([
-            'exists' => false,
-            'promo_price' => 0
-        ]);
+        die("Error: Missing order ID.");
     }
-} catch (PDOException $e) {
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+} else {
+    die("Error: Invalid request method.");
 }
