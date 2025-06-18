@@ -22,22 +22,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $category = $_POST['category'] ?? '';
     $price = $_POST['price'] ?? '';
     $profit = $_POST['profit'] ?? '';
-    $quantities = $_POST['quantities'] ?? [];
+    $co_codes = $_POST['co_codes'] ?? [];
+    $co_codes_json = json_encode($co_codes);
 
     if (true) {
         try {
             $pdo->beginTransaction();
 
             // Prepare size_quantity data
-            $size_quantity = [];
-            foreach ($quantities as $size => $quantity) {
-                $size_quantity[] = "$size-$quantity";
-            }
-            $size_quantity_str = implode(',', $size_quantity);
+            
 
             $stmt = $pdo->prepare("
-                INSERT INTO reseller (name, account_details, contact_No, category, price, profit, size_quantity) 
-                VALUES (:name, :account_details, :contact_No, :category, :price, :profit, :size_quantity)
+                INSERT INTO reseller (name, account_details, contact_No, category, price, profit,  co_code) 
+                VALUES (:name, :account_details, :contact_No, :category, :price, :profit,  :co_code)
             ");
             $stmt->execute([
                 ':name' => $name,
@@ -46,7 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':category' => $category,
                 ':price' => $price,
                 ':profit' => $profit,
-                ':size_quantity' => $size_quantity_str,
+                
+                ':co_code' => $co_codes_json
             ]);
 
             $pdo->commit();
@@ -124,19 +122,7 @@ if (empty($error)) {
                     <label for="contactno"><i class="fas fa-tag"></i> Contact No</label>
                     <input type="number" id="contactno" name="contactno" placeholder="Enter Contact No" required>
                 </div>
-                <div class="form-group">
-                    <label for="category"><i class="fas fa-list-alt"></i> Resale Products</label>
-                    <select id="category" name="category" required>
-                        <option value="">Select Category</option>
-                        <?php if (!empty($products)): ?>
-                            <?php foreach ($products as $product): ?>
-                                <option value="<?= htmlspecialchars($product['product_id']) ?>"><?= htmlspecialchars($product['name']) ?></option>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <option value="">No products found.</option>
-                        <?php endif; ?>
-                    </select>
-                </div>
+                
                 <!-- <div class="form-group">
                 <label for="quantities"><i class="fas fa-box-open"></i> Stock (Size and Quantity)</label>
                 <div id="stock-container"></div>
@@ -148,6 +134,15 @@ if (empty($error)) {
                 <div class="form-group">
                     <label for="profit"><i class="fas fa-tag"></i> Resale Profit</label>
                     <input type="number" id="profit" name="profit" placeholder="Enter Profit" required>
+                </div>
+                <div class="form-group">
+                    <label>Co Codes</label>
+                    <div id="co-codes-wrapper">
+                        <div class="co-code-group">
+                            <input type="text" name="co_codes[]" class="co-code-input" required placeholder="Enter Co Code">
+                            <button type="button" class="add-co-code-btn" onclick="addCoCodeField(this)" style="margin-left:5px;">+</button>
+                        </div>
+                    </div>
                 </div>
                 <button type="submit"><i class="fas fa-save"></i> Add Reseller</button>
             </form>
@@ -191,6 +186,31 @@ if (empty($error)) {
                 div.appendChild(input);
                 sizesContainer.appendChild(div);
             });
+        }
+
+        function addCoCodeField(btn) {
+            const wrapper = document.getElementById('co-codes-wrapper');
+            const group = document.createElement('div');
+            group.className = 'co-code-group';
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = 'co_codes[]';
+            input.className = 'co-code-input';
+            input.required = true;
+            input.placeholder = 'Enter Co Code';
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.textContent = '-';
+            removeBtn.style.marginLeft = '5px';
+            removeBtn.onclick = function() {
+                group.remove();
+            };
+
+            group.appendChild(input);
+            group.appendChild(removeBtn);
+            wrapper.appendChild(group);
         }
     </script>
 </body>

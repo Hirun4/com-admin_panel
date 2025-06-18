@@ -17,15 +17,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'] ?? '';
     $account_details = $_POST['account_details'] ?? '';
     $contact_no = $_POST['contact_no'] ?? '';
-    $product_name = $_POST['product_name'] ?? '';
     $price = $_POST['price'] ?? '';
     $profit = $_POST['profit'] ?? '';
+    $co_codes = $_POST['co_codes'] ?? [];
+    $co_codes_json = json_encode($co_codes);
 
-    if ($reseller_id && $name && $account_details && $contact_no && $product_name && $price && $profit) {
+    if ($reseller_id && $name && $account_details && $contact_no && $price && $profit) {
         try {
             $stmt = $pdo->prepare("
                 UPDATE reseller
-                SET name = :name, account_details = :account_details, contact_No = :contact_no, price = :price, profit = :profit
+                SET name = :name, account_details = :account_details, contact_No = :contact_no, price = :price, profit = :profit, co_code = :co_code
                 WHERE reseller_id = :reseller_id
             ");
             $stmt->execute([
@@ -34,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':contact_no' => $contact_no,
                 ':price' => $price,
                 ':profit' => $profit,
+                ':co_code' => $co_codes_json,
                 ':reseller_id' => $reseller_id,
             ]);
 
