@@ -161,6 +161,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+if (isset($_GET['fetch_buying_price_code']) && isset($_GET['co_code'])) {
+    $co_code = $_GET['co_code'];
+    $stmt = $pdo->prepare("SELECT buying_price_code FROM product_codes WHERE co_code = :co_code");
+    $stmt->execute([':co_code' => $co_code]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($result) {
+        echo json_encode(['success' => true, 'buying_price_code' => $result['buying_price_code']]);
+    } else {
+        echo json_encode(['success' => false]);
+    }
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -288,8 +302,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <input type="number" id="quantity" name="products[0][quantity]" min="1" required>
                             </div>
                             <div class="form-group">
-                                <label for="buying_price_code"><i class="fas fa-dollar-sign"></i> Buying Price (Code)</label>
-                                <input type="text" id="buying_price_code" name="products[0][buying_price_code]" onchange="fetchBuyingPrice()" required>
+                                <label for="co_code_0"><i class="fas fa-dollar-sign"></i> Co Code</label>
+                                <input type="text" id="co_code_0" name="products[0][co_code]" required onblur="fetchBuyingPrice(this)">
+                            </div>
+                            <div class="form-group"  style="display: none;">
+                                <label for="buying_price_code_0"><i class="fas fa-dollar-sign"></i> Buying Price (Code)</label>
+                                <input type="text" id="buying_price_code_0" name="products[0][buying_price_code]" readonly>
                             </div>
                             <div class="form-group">
                                 <label for="selling_price"><i class="fas fa-dollar-sign"></i> Selling Price</label>
@@ -405,21 +423,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         });
 
-        // Fetch buying price
-        function fetchBuyingPrice() {
-            const code = document.getElementById('buying_price_code').value;
-            if (code) {
-                fetch(`fetch_buying_price.php?code=${code}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            document.getElementById('buying_price').value = data.buying_price;
-                        } else {
-                            alert('Invalid code!');
-                        }
-                    });
-            }
+        function fetchBuyingPrice(coCodeInput) {
+        const coCode = coCodeInput.value.trim();
+        const productEntry = coCodeInput.closest('.product-entry');
+        const index = productEntry.dataset.index || 0;
+        const buyingPriceInput = document.getElementById('buying_price_code_' + index);
+
+        if (!coCode) {
+            buyingPriceInput.value = '';
+            return;
         }
+
+        fetch(`add_code.php?fetch_buying_price_code=1&co_code=${encodeURIComponent(coCode)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    buyingPriceInput.value = data.buying_price_code;
+                } else {
+                    buyingPriceInput.value = 'Invalid';
+                }
+            })
+            .catch(() => {
+                buyingPriceInput.value = 'Error';
+            });
+    }
+        // Fetch buying price
+        // function fetchBuyingPrice() {
+        //     const code = document.getElementById('buying_price_code').value;
+        //     if (code) {
+        //         fetch(`fetch_buying_price.php?code=${code}`)
+        //             .then(response => response.json())
+        //             .then(data => {
+        //                 if (data.success) {
+        //                     document.getElementById('buying_price').value = data.buying_price;
+        //                 } else {
+        //                     alert('Invalid code!');
+        //                 }
+        //             });
+        //     }
+        // }
 
         // Update categories
         function updateCategories(originField) {

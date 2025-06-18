@@ -89,7 +89,7 @@ if (isset($_GET['fetch_buying_price_code']) && isset($_GET['co_code'])) {
 
     <div class="main-content">
         <div class="top-bar">Add New Code</div>
-        <form method="POST">
+        <form method="POST" id="add-code-form">
             <?php if ($error): ?>
                 <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
             <?php endif; ?>
@@ -110,9 +110,12 @@ if (isset($_GET['fetch_buying_price_code']) && isset($_GET['co_code'])) {
             <div class="form-group">
                 <label>Co Codes:</label>
                 <div id="co-codes-wrapper">
-                    <input type="text" name="co_codes[]" required>
+                    <div class="co-code-group">
+                        <input type="text" name="co_codes[]" class="co-code-input" required>
+                        <input type="text" class="buying-price-code-input" placeholder="Buying Price Code" readonly style="margin-left:10px;">
+                    </div>
                 </div>
-                <button type="button" type="button" onclick="addCoCodeField()" style="margin-top:5px;">+</button>
+                <button type="button" onclick="addCoCodeField()" style="margin-top:5px;">+</button>
             </div>
 
             <button type="submit">Add Code</button>
@@ -121,25 +124,73 @@ if (isset($_GET['fetch_buying_price_code']) && isset($_GET['co_code'])) {
 
     <script>
         // Highlight active link in the sidebar
-        const currentPage = window.location.pathname.split('/').pop(); // Get the current page
+        const currentPage = window.location.pathname.split('/').pop();
         const sidebarLinks = document.querySelectorAll('.sidebar nav a');
-
         sidebarLinks.forEach(link => {
             if (link.href.includes(currentPage)) {
-                link.classList.add('active'); // Add 'active' class to the link of the current page
+                link.classList.add('active');
             }
         });
 
+        // Add new co code field with buying price code field
         function addCoCodeField() {
             var wrapper = document.getElementById('co-codes-wrapper');
+            var group = document.createElement('div');
+            group.className = 'co-code-group';
             var input = document.createElement('input');
             input.type = 'text';
             input.name = 'co_codes[]';
+            input.className = 'co-code-input';
             input.required = true;
             input.style.marginTop = '5px';
-            wrapper.appendChild(document.createElement('br'));
-            wrapper.appendChild(input);
+
+            var buyingPriceInput = document.createElement('input');
+            buyingPriceInput.type = 'text';
+            buyingPriceInput.className = 'buying-price-code-input';
+            buyingPriceInput.placeholder = 'Buying Price Code';
+            buyingPriceInput.readOnly = true;
+            buyingPriceInput.style.marginLeft = '10px';
+
+            group.appendChild(input);
+            group.appendChild(buyingPriceInput);
+            wrapper.appendChild(group);
+
+            input.addEventListener('blur', handleCoCodeInput);
         }
+
+        // Attach event listeners to existing co code input
+        document.querySelectorAll('.co-code-input').forEach(input => {
+            input.addEventListener('blur', handleCoCodeInput);
+        });
+
+        // Handle co code input blur event
+        function handleCoCodeInput(e) {
+            const coCode = e.target.value.trim();
+            const buyingPriceInput = e.target.parentElement.querySelector('.buying-price-code-input');
+            if (!coCode) {
+                buyingPriceInput.value = '';
+                return;
+            }
+            fetch(`add_code.php?fetch_buying_price_code=1&co_code=${encodeURIComponent(coCode)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        buyingPriceInput.value = data.buying_price_code;
+                    } else {
+                        buyingPriceInput.value = 'Invalid';
+                    }
+                })
+                .catch(() => {
+                    buyingPriceInput.value = 'Error';
+                });
+        }
+
+        // When form is loaded, attach event listeners to all co code inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.co-code-input').forEach(input => {
+                input.addEventListener('blur', handleCoCodeInput);
+            });
+        });
     </script>
 </body>
 </html>
