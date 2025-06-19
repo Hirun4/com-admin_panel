@@ -28,7 +28,6 @@ try {
     $stmtOrderItems = $pdo->prepare("SELECT * FROM order_items WHERE order_id = :order_id");
     $stmtOrderItems->execute([':order_id' => $order_id]);
     $order_items = $stmtOrderItems->fetchAll(PDO::FETCH_ASSOC);
-    print_r($order_items);
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Update the orders table
@@ -62,13 +61,29 @@ try {
         ]);
 
         // Delete existing order items and re-insert updated items
-        $stmtDeleteItems = $pdo->prepare("DELETE FROM order_items WHERE order_id = :order_id");
-        $stmtDeleteItems->execute([':order_id' => $order_id]);
+        // $stmtDeleteItems = $pdo->prepare("DELETE FROM order_items WHERE order_id = :order_id");
+        // $stmtDeleteItems->execute([':order_id' => $order_id]);
+
+        // $stmtInsertItems = $pdo->prepare("
+        //     INSERT INTO order_items (order_id, product_id, origin_country, size, quantity, buying_price_code, buying_price, selling_price, discount)
+        //     VALUES (:order_id, :product_id, :origin_country, :size, :quantity, :buying_price_code, :buying_price, :selling_price, :discount)
+        // ");
 
         $stmtInsertItems = $pdo->prepare("
-            INSERT INTO order_items (order_id, product_id, origin_country, size, quantity, buying_price_code, buying_price, selling_price, discount)
-            VALUES (:order_id, :product_id, :origin_country, :size, :quantity, :buying_price_code, :buying_price, :selling_price, :discount)
-        ");
+                                            UPDATE order_items
+                                                SET
+                                                    origin_country = :origin_country,
+                                                    size = :size,
+                                                    quantity = :quantity,
+                                                    buying_price_code = :buying_price_code,
+                                                    co_code = :co_code,
+                                                    buying_price = :buying_price,
+                                                    selling_price = :selling_price,
+                                                    discount = :discount
+                                                WHERE
+                                                    order_id = :order_id AND
+                                                    product_id = :product_id;
+                                            ");
 
         foreach ($_POST['products'] as $product) {
             $stmtInsertItems->execute([
@@ -78,10 +93,12 @@ try {
                 ':size' => $product['size'],
                 ':quantity' => $product['quantity'],
                 ':buying_price_code' => $product['buying_price_code'] ?? '',
+                ':co_code' => $product['co_code'] ?? '',
                 ':buying_price' => $product['buying_price'] ?? 0,
                 ':selling_price' => $product['selling_price'],
                 ':discount' => $product['discount'],
             ]);
+            // print_r($product);
         }
 
         $success = "Order updated successfully!";
@@ -116,6 +133,20 @@ try {
             deliveryMethod.addEventListener('change', toggleHomeFields);
             toggleHomeFields(); // Initial check
         });
+
+        if (isset($_GET['fetch_buying_price_code']) && isset($_GET['co_code'])) {
+    $co_code = $_GET['co_code'];
+    $stmt = $pdo->prepare("SELECT buying_price_code FROM product_codes WHERE co_code = :co_code");
+    $stmt->execute([':co_code' => $co_code]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($result) {
+        echo json_encode(['success' => true, 'buying_price_code' => $result['buying_price_code']]);
+    } else {
+        echo json_encode(['success' => false]);
+    }
+    exit;
+}
     </script>
 </head>
 
@@ -226,12 +257,20 @@ try {
                                 <input type="number" id="quantity_<?= $index ?>" name="products[<?= $index ?>][quantity]" value="<?= htmlspecialchars($item['quantity']) ?>">
                             </div>
                             <div class="form-group">
-                                <label for="buying_price_code_<?= $index ?>"><i class="fas fa-code"></i> Co Code</label>
-                                <input type="text" id="buying_price_code_<?= $index ?>" name="products[<?= $index ?>][buying_price_code]" value="<?= htmlspecialchars($item['buying_price_code'] ?? '') ?>">
+                                <label for="co_code_<?= $index ?>"><i class="fas fa-code"></i> Co Code</label>
+                                <input type="text"
+                                    id="co_code_<?= $index ?>"
+                                    name="products[<?= $index ?>][co_code]"
+                                    value="<?= htmlspecialchars($item['co_code'] ?? '') ?>"
+                                    onblur="fetchBuyingPriceCode(this, <?= $index ?>)">
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" style="display: none;">
                                 <label for="buying_price_code_<?= $index ?>"><i class="fas fa-code"></i> Buying Price Code</label>
-                                <input type="text" id="buying_price_code_<?= $index ?>" name="products[<?= $index ?>][buying_price_code]" value="<?= htmlspecialchars($item['buying_price_code'] ?? '') ?>">
+                                <input type="text"
+                                    id="buying_price_code_<?= $index ?>"
+                                    name="products[<?= $index ?>][buying_price_code]"
+                                    value="<?= htmlspecialchars($item['buying_price_code'] ?? '') ?>"
+                                    readonly>
                             </div>
                             <div class="form-group">
                                 <label for="selling_price_<?= $index ?>"><i class="fas fa-dollar-sign"></i> Selling Price</label>
@@ -250,6 +289,30 @@ try {
             </div>
         </div>
     </div>
+    <script>
+        function fetchBuyingPriceCode(coCodeInput, index) {
+    const coCode = coCodeInput.value.trim();
+    const buyingPriceInput = document.getElementById('buying_price_code_' + index);
+
+    if (!coCode) {
+        buyingPriceInput.value = '';
+        return;
+    }
+
+    fetch('add_code.php?fetch_buying_price_code=1&co_code=' + encodeURIComponent(coCode))
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                buyingPriceInput.value = data.buying_price_code;
+            } else {
+                buyingPriceInput.value = 'Invalid';
+            }
+        })
+        .catch(() => {
+            buyingPriceInput.value = 'Error';
+        });
+}
+    </script>
 </body>
 
 </html>

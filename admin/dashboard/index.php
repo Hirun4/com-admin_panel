@@ -208,6 +208,147 @@ try {
 } catch (PDOException $e) {
     $refundRequestCount = 0;
 }
+
+// Fetch total refund amount and profit adjustment for Home
+$stmt = $pdo->prepare("
+    SELECT 
+        SUM(rr.refund_amount) AS total_refund,
+        SUM(
+            rr.refund_amount - IFNULL((
+                SELECT SUM(oi.quantity * IFNULL(pc.buying_price, 0))
+                FROM order_items oi
+                LEFT JOIN product_codes pc ON oi.buying_price_code = pc.code
+                WHERE oi.order_id = rr.order_id
+            ), 0)
+        ) AS total_refund_profit
+    FROM refund_requests rr
+    JOIN orders o ON rr.order_id = o.order_id
+    WHERE rr.status = 'APPROVED'
+      AND o.delivery_method = 'Home'
+      AND MONTH(o.created_at) = MONTH(:dateFilter)
+      AND YEAR(o.created_at) = YEAR(:dateFilter)
+");
+$stmt->bindParam(':dateFilter', $dateFilter);
+$stmt->execute();
+$homeRefundStats = $stmt->fetch(PDO::FETCH_ASSOC);
+$homeRefund = $homeRefundStats['total_refund'] ?? 0;
+$homeRefundProfit = $homeRefundStats['total_refund_profit'] ?? 0;
+
+// Fetch total refund amount and profit adjustment for Courier
+$stmt = $pdo->prepare("
+    SELECT 
+        SUM(rr.refund_amount) AS total_refund,
+        SUM(
+            rr.refund_amount - IFNULL((
+                SELECT SUM(oi.quantity * IFNULL(pc.buying_price, 0))
+                FROM order_items oi
+                LEFT JOIN product_codes pc ON oi.buying_price_code = pc.code
+                WHERE oi.order_id = rr.order_id
+            ), 0)
+        ) AS total_refund_profit
+    FROM refund_requests rr
+    JOIN orders o ON rr.order_id = o.order_id
+    WHERE rr.status = 'APPROVED'
+      AND o.delivery_method = 'Courier'
+      AND MONTH(o.created_at) = MONTH(:dateFilter)
+      AND YEAR(o.created_at) = YEAR(:dateFilter)
+");
+$stmt->bindParam(':dateFilter', $dateFilter);
+$stmt->execute();
+$courierRefundStats = $stmt->fetch(PDO::FETCH_ASSOC);
+$courierRefund = $courierRefundStats['total_refund'] ?? 0;
+$courierRefundProfit = $courierRefundStats['total_refund_profit'] ?? 0;
+
+// Adjust revenue and profit for Home and Courier separately
+$homeStats['total_income'] = ($homeStats['total_income'] ?? 0) - $homeRefund;
+$homeStats['profit'] = ($homeStats['profit'] ?? 0) - $homeRefundProfit;
+
+$courierStats['total_income'] = ($courierStats['total_income'] ?? 0) - $courierRefund;
+$courierStats['profit'] = ($courierStats['profit'] ?? 0) - $courierRefundProfit;
+
+// Adjust total revenue and profit for the dashboard
+$totalRevenue = ($homeStats['total_income'] ?? 0) + ($courierStats['total_income'] ?? 0);
+$totalProfit = ($homeStats['profit'] ?? 0) + ($courierStats['profit'] ?? 0);
+
+// Home orders: revenue and profit for today
+$today = date('Y-m-d');
+
+$stmt = $pdo->prepare("
+    SELECT 
+        SUM(oi.quantity * oi.selling_price) AS home_revenue,
+        SUM((oi.selling_price - IFNULL(pc.buying_price, 0)) * oi.quantity) AS home_profit
+    FROM order_items oi
+    JOIN orders o ON oi.order_id = o.order_id
+    LEFT JOIN product_codes pc ON oi.buying_price_code = pc.code
+    WHERE o.delivery_method = 'Home'
+      AND DATE(o.created_at) = :today
+      AND o.status NOT IN ('REJECTED', 'CANCELLED')
+");
+$stmt->execute([':today' => $today]);
+$homeToday = $stmt->fetch(PDO::FETCH_ASSOC);
+$homeTodayRevenue = $homeToday['home_revenue'] ?? 0;
+$homeTodayProfit = $homeToday['home_profit'] ?? 0;
+
+// Courier orders: revenue and profit for today
+$stmt = $pdo->prepare("
+    SELECT 
+        SUM(oi.quantity * oi.selling_price) AS courier_revenue,
+        SUM((oi.selling_price - IFNULL(pc.buying_price, 0)) * oi.quantity) AS courier_profit
+    FROM order_items oi
+    JOIN orders o ON oi.order_id = o.order_id
+    LEFT JOIN product_codes pc ON oi.buying_price_code = pc.code
+    WHERE o.delivery_method = 'Courier'
+      AND DATE(o.created_at) = :today
+      AND o.status NOT IN ('REJECTED', 'CANCELLED')
+");
+$stmt->execute([':today' => $today]);
+$courierToday = $stmt->fetch(PDO::FETCH_ASSOC);
+$courierTodayRevenue = $courierToday['courier_revenue'] ?? 0;
+$courierTodayProfit = $courierToday['courier_profit'] ?? 0;
+
+// Home refunds for today
+$stmt = $pdo->prepare("
+    SELECT 
+        SUM(rr.refund_amount) AS refund,
+        SUM(rr.refund_amount - IFNULL((
+            SELECT SUM(oi.quantity * IFNULL(pc.buying_price, 0))
+            FROM order_items oi
+            LEFT JOIN product_codes pc ON oi.buying_price_code = pc.code
+            WHERE oi.order_id = rr.order_id
+        ), 0)) AS refund_profit
+    FROM refund_requests rr
+    JOIN orders o ON rr.order_id = o.order_id
+    WHERE rr.status = 'APPROVED'
+      AND o.delivery_method = 'Home'
+      AND DATE(o.created_at) = :today
+");
+$stmt->execute([':today' => $today]);
+$homeRefundToday = $stmt->fetch(PDO::FETCH_ASSOC);
+$homeTodayRevenue -= $homeRefundToday['refund'] ?? 0;
+$homeTodayProfit -= $homeRefundToday['refund_profit'] ?? 0;
+
+// Courier refunds for today
+$stmt = $pdo->prepare("
+    SELECT 
+        SUM(rr.refund_amount) AS refund,
+        SUM(rr.refund_amount - IFNULL((
+            SELECT SUM(oi.quantity * IFNULL(pc.buying_price, 0))
+            FROM order_items oi
+            LEFT JOIN product_codes pc ON oi.buying_price_code = pc.code
+            WHERE oi.order_id = rr.order_id
+        ), 0)) AS refund_profit
+    FROM refund_requests rr
+    JOIN orders o ON rr.order_id = o.order_id
+    WHERE rr.status = 'APPROVED'
+      AND o.delivery_method = 'Courier'
+      AND DATE(o.created_at) = :today
+");
+$stmt->execute([':today' => $today]);
+$courierRefundToday = $stmt->fetch(PDO::FETCH_ASSOC);
+$courierTodayRevenue -= $courierRefundToday['refund'] ?? 0;
+$courierTodayProfit -= $courierRefundToday['refund_profit'] ?? 0;
+
+// Now $homeTodayRevenue, $homeTodayProfit, $courierTodayRevenue, $courierTodayProfit reflect today's net values
 ?>
 
 <!DOCTYPE html>

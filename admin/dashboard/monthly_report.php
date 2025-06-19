@@ -82,6 +82,34 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([':startDate' => $startDate, ':endDate' => $endDate]);
 $totalProfit = $stmt->fetch(PDO::FETCH_ASSOC)['total_profit'] ?? 0;
+
+// Fetch total refund amount and total buying price for approved refunds in the selected month
+$stmt = $pdo->prepare("
+    SELECT 
+        SUM(rr.refund_amount) AS total_refund,
+        SUM(
+            rr.refund_amount - IFNULL((
+                SELECT SUM(oi.quantity * IFNULL(pc.buying_price, 0))
+                FROM order_items oi
+                LEFT JOIN product_codes pc ON oi.buying_price_code = pc.code
+                WHERE oi.order_id = rr.order_id
+            ), 0)
+        ) AS total_refund_profit
+    FROM refund_requests rr
+    WHERE rr.status = 'APPROVED'
+      AND EXISTS (
+          SELECT 1 FROM orders o WHERE o.order_id = rr.order_id
+            AND o.created_at BETWEEN :startDate AND :endDate
+      )
+");
+$stmt->execute([':startDate' => $startDate, ':endDate' => $endDate]);
+$refundStats = $stmt->fetch(PDO::FETCH_ASSOC);
+$totalRefund = $refundStats['total_refund'] ?? 0;
+$totalRefundProfit = $refundStats['total_refund_profit'] ?? 0;
+
+// Adjust revenue and profit
+$totalRevenue = ($totalRevenue ?? 0) - $totalRefund;
+$totalProfit = ($totalProfit ?? 0) - $totalRefundProfit;
 ?>
 
 <!DOCTYPE html>
