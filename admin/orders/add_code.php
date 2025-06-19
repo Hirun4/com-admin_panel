@@ -77,15 +77,62 @@ if (isset($_GET['fetch_buying_price_code']) && isset($_GET['co_code'])) {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="sidebar">
-        <h1>Admin Panel</h1>
-        <nav>
-            <a href="../dashboard/index.php" id="dashboard-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="manage_orders.php"><i class="fas fa-box"></i> Manage Orders</a>
-            <a href="add_code.php" id="add-code-link" class="active"><i class="fas fa-key"></i> Add Code</a>
-            <a href="../auth/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
-        </nav>
-    </div>
+    <aside class="sidebar">
+            <h2>Admin Panel</h2>
+            <nav>
+                <a href="/project/admin/dashboard/index.php" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <?php
+                // Main admin: show all tabs
+                if (isset($_SESSION['admin_logged_in']) && !isset($_SESSION['is_other_admin'])) {
+                ?>
+                    <a href="../products/manage_products.php"><i class="fas fa-boxes"></i> Manage Products</a>
+                    <a href="../orders/manage_orders.php"><i class="fas fa-clipboard-list"></i> Manage Orders</a>
+                    <a href="../stock/code.php"><i class="fas fa-cogs"></i> Stock Management</a>
+                    <a href="../expenses/manage_expenses.php"><i class="fas fa-money-bill-wave"></i> Manage Expenses</a>
+                    <a href="../facebook/view_ads.php"><i class="fab fa-facebook"></i> Facebook Ads</a>
+                    <a href="/project/admin/dashboard/monthly_code.php"><i class="fas fa-chart-line"></i> Monthly Report</a>
+                    <a href="/project/admin/dashboard/resellers.php"><i class="fas fa-user"></i> Re Sellers</a>
+                    <a href="/project/admin/dashboard/add_admin.php"><i class="fas fa-user"></i> Add Admin</a>
+                <?php
+                }
+                // Other admin: show only allowed tabs
+                elseif (isset($_SESSION['admin_logged_in']) && isset($_SESSION['is_other_admin']) && isset($_SESSION['admin_id'])) {
+                    // Always show dashboard
+                    $adminId = $_SESSION['admin_id'];
+                    $stmt = $pdo->prepare("SELECT * FROM new_admins WHERE id = ?");
+                    $stmt->execute([$adminId]);
+                    $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                    if ($admin) {
+                        if ($admin['Manage_products'] === 'yes') {
+                            echo '<a href="../products/manage_products.php"><i class="fas fa-boxes"></i> Manage Products</a>';
+                        }
+                        if ($admin['Manage_orders'] === 'yes') {
+                            echo '<a href="../orders/manage_orders.php"><i class="fas fa-clipboard-list"></i> Manage Orders</a>';
+                        }
+                        if ($admin['Stock_Management'] === 'yes') {
+                            echo '<a href="../stock/code.php"><i class="fas fa-cogs"></i> Stock Management</a>';
+                        }
+                        if ($admin['Manage_expence'] === 'yes') {
+                            echo '<a href="../expenses/manage_expenses.php"><i class="fas fa-money-bill-wave"></i> Manage Expenses</a>';
+                        }
+                        if ($admin['Facebook_ads'] === 'yes') {
+                            echo '<a href="../facebook/view_ads.php"><i class="fab fa-facebook"></i> Facebook Ads</a>';
+                        }
+                        if ($admin['Monthly_reports'] === 'yes') {
+                            echo '<a href="/project/admin/dashboard/monthly_code.php"><i class="fas fa-chart-line"></i> Monthly Report</a>';
+                        }
+                        if ($admin['Resellers'] === 'yes') {
+                            echo '<a href="/project/admin/dashboard/resellers.php"><i class="fas fa-user"></i> Re Sellers</a>';
+                        }
+                        // Always show Add Admin for main admin only
+                        // Always show Dashboard for all
+                    }
+                }
+                ?>
+                <a href="../auth/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </nav>
+        </aside>
 
     <div class="main-content">
         <div class="top-bar">Add New Code</div>

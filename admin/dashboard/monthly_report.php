@@ -127,20 +127,7 @@ $totalProfit = ($totalProfit ?? 0) - $totalRefundProfit;
 <body>
     <div class="container">
         <!-- Sidebar -->
-        <aside class="sidebar">
-            <h2>Admin Panel</h2>
-            <nav>
-                <a href="../dashboard/index.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-                <a href="../products/manage_products.php"><i class="fas fa-boxes"></i> Manage Products</a>
-                <a href="../orders/manage_orders.php"><i class="fas fa-clipboard-list"></i> Manage Orders</a>
-                <a href="../stock/code.php"><i class="fas fa-cogs"></i> Stock Management</a>
-                <a href="../expenses/manage_expenses.php"><i class="fas fa-money-bill-wave"></i> Manage Expenses</a>
-                <a href="../facebook/view_ads.php"><i class="fab fa-facebook"></i> Facebook Ads</a>
-                <a href="../dashboard/monthly_code.php" class="active"><i class="fas fa-chart-line"></i> Monthly Report</a>
-                <a href="../dashboard/resellers.php"><i class="fas fa-user"></i> Re Sellers</a>
-                <a href="../auth/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </nav>
-        </aside>
+        <?php include __DIR__ . '/sidebar.php'; ?>
 
         <!-- Main Content -->
         <main class="main-content">
