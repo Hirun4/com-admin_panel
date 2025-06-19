@@ -235,6 +235,7 @@ try {
                 <a href="../facebook/view_ads.php"><i class="fab fa-facebook"></i> Facebook Ads</a>
                 <a href="monthly_code.php"><i class="fas fa-chart-line"></i> Monthly Report</a>
                 <a href="resellers.php"><i class="fas fa-user"></i> Re Sellers</a>
+                <a href="add_admin.php"><i class="fas fa-user"></i> Add Admin</a>
                 <a href="../auth/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </nav>
         </aside>
@@ -266,7 +267,7 @@ try {
                     <h2>Total Revenue for <?= $formattedDate ?></h2>
                     <p>Rs. <?= number_format($totalRevenue, 2) ?></p>
                 </div>
-                
+
                 <div class="stat" id="orderRequestCard" style="cursor:pointer; background:#f1c40f;">
                     <h2>Order Requests</h2>
                     <p id="orderRequestCount"><?= $orderRequestCount ?></p>

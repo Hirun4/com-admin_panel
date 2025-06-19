@@ -19,6 +19,7 @@ foreach ($requests as $req) {
     echo "<strong>District:</strong> " . htmlspecialchars($req['district']) . "<br>";
     echo "<strong>Date:</strong> " . htmlspecialchars($req['created_at']) . "<br>";
     echo "<strong>Status:</strong> " . htmlspecialchars($req['status']) . "<br>";
+    echo "<strong>Status:</strong> " . htmlspecialchars($req['payment_method']) . "<br>";
 
     // Fetch items for this request
     $stmt2 = $pdo->prepare("SELECT * FROM customer_order_request_item WHERE customer_order_request_id = ?");

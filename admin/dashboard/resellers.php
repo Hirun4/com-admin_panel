@@ -19,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'] ?? '';
     $account_details = $_POST['account_details'] ?? '';
     $contact = $_POST['contactno'] ?? '';
+    $contact2 = $_POST['contactno2'] ?? '';
     $category = $_POST['category'] ?? '';
     $price = $_POST['price'] ?? '';
     $profit = $_POST['profit'] ?? '';
@@ -40,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':name' => $name,
                 ':account_details' => $account_details,
                 ':contact_No' => $contact,
+                ':phone_number' => $contact2,
                 ':category' => $category,
                 ':price' => $price,
                 ':profit' => $profit,
@@ -119,14 +121,14 @@ if (empty($error)) {
                     <textarea id="description" name="account_details" rows="4" placeholder="Enter account details" required></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="contactno"><i class="fas fa-tag"></i> Contact No</label>
+                    <label for="contactno"><i class="fas fa-tag"></i> Phone Number 1</label>
                     <input type="number" id="contactno" name="contactno" placeholder="Enter Contact No" required>
                 </div>
                 
                 <!-- <div class="form-group">
                 <label for="quantities"><i class="fas fa-box-open"></i> Stock (Size and Quantity)</label>
                 <div id="stock-container"></div>
-            </div> -->
+            </div>
                 <div class="form-group">
                     <label for="price"><i class="fas fa-tag"></i> Resale Price</label>
                     <input type="number" id="price" name="price" placeholder="Enter Price" required>

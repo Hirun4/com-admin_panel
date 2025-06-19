@@ -24,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $address = $_POST['address'] ?? '';
     $phone_number1 = $_POST['phone_number1'] ?? '';
     $phone_number2 = ($delivery_method === 'Courier') ? ($_POST['phone_number2'] ?? '') : null;
+    $payment_method = ($delivery_method === 'Courier') ? ($_POST['payment'] ?? '') : null;
     $district = $_POST['district'] ?? '';
     $delivery_fee = $_POST['delivery_fee'] ?? 0.00;
     if ($delivery_fee === '' || $delivery_fee === null) {
@@ -46,8 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Insert order details
             $stmtOrder = $pdo->prepare("
-                INSERT INTO orders (tracking_number, customer_name, address, phone_number, phone_number1, phone_number2, district, delivery_method, status, return_reason, delivery_fee, created_at, updated_at)
-                VALUES (:tracking_number, :customer_name, :address, :phone_number, :phone_number1, :phone_number2, :district, :delivery_method, :status, :return_reason, :delivery_fee, NOW(), NOW())
+                INSERT INTO orders (tracking_number, customer_name, address, phone_number, phone_number1, phone_number2, district, delivery_method, status, payment_method, return_reason, delivery_fee, created_at, updated_at)
+                VALUES (:tracking_number, :customer_name, :address, :phone_number, :phone_number1, :phone_number2, :district, :delivery_method, :status, :payment_method, :return_reason, :delivery_fee, NOW(), NOW())
             ");
             $stmtOrder->execute([
                 ':tracking_number' => $tracking_number,
@@ -59,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':district' => $district,
                 ':delivery_method' => $delivery_method,
                 ':status' => $status,
+                ':payment_method' => $payment_method,
                 ':return_reason' => $return_reason,
                 ':delivery_fee' => $delivery_fee,
 
@@ -261,6 +263,13 @@ if (isset($_GET['fetch_buying_price_code']) && isset($_GET['co_code'])) {
                         <div class="form-group">
                             <label for="district"><i class="fas fa-city"></i> District</label>
                             <input type="text" id="district" name="district">
+                        </div>
+                        <div class="form-group">
+                            <label for="district"><i class="fas fa-city"></i> Payment Method</label>
+                            <select id="delivery_method" name="payment" required>
+                                <option value="CASH_ON_DELIVERY" selected>CASH_ON_DELIVERY</option>
+                                <option value="BANK_TRANSFER">BANK_TRANSFER</option>
+                        </select>
                         </div>
                     </div>
 

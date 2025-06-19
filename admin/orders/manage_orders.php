@@ -32,6 +32,7 @@ try {
             o.return_reason,
             o.created_at,
             o.delivery_fee,
+            o.payment_method,
             GROUP_CONCAT(p.name SEPARATOR '<br>') AS product_names,
             GROUP_CONCAT(p.category SEPARATOR '<br>') AS categories,
             GROUP_CONCAT(oi.size SEPARATOR '<br>') AS sizes,
@@ -189,6 +190,7 @@ try {
                                 <th><i class="fas fa-truck"></i> Delivery Method</th>
                                 <th><i class="fas fa-dollar-sign"></i> Delivery Fee</th>
                                 <th><i class="fas fa-info-circle"></i> Status</th>
+                                <th><i class="fas fa-info-circle"></i> Payment Method</th>
                                 <th><i class="fas fa-undo"></i> Return Reason</th>
                                 <th><i class="fas fa-calendar-alt"></i> Created At</th>
                                 <th><i class="fas fa-tools"></i> Actions</th>
@@ -223,6 +225,7 @@ try {
                                         <td><?= htmlspecialchars($order['delivery_method']) ?></td>
                                         <td><?= htmlspecialchars($order['delivery_fee']) ?></td>
                                         <td><?= htmlspecialchars($order['status']) ?></td>
+                                        <td><?= htmlspecialchars($order['payment_method']) ?></td>
                                         <td><?= htmlspecialchars($order['return_reason'] ?? '-') ?></td>
                                         <td><?= htmlspecialchars($order['created_at']) ?></td>
                                         <td>

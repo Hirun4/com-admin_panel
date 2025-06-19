@@ -22,13 +22,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Insert into orders table
-        $stmt = $pdo->prepare("INSERT INTO orders (customer_name, phone_number, address, district, delivery_fee, created_at, status) VALUES (?, ?, ?, ?, ?, NOW(), 'PENDING')");
+        $stmt = $pdo->prepare("INSERT INTO orders (customer_name, phone_number, address, district, delivery_fee,payment_method, created_at, status) VALUES (?, ?, ?, ?, ?, ?, NOW(), 'PENDING')");
         $stmt->execute([
             $request['customer_name'],
             $request['phone_number'],
             $request['address'],
             $request['district'],
-            $request['delivery_fee']
+            $request['delivery_fee'],
+            $request['payment_method'],
+
         ]);
         $orderId = $pdo->lastInsertId();
 

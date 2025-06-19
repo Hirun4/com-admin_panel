@@ -1,6 +1,8 @@
 <?php
+
 session_start();
 include_once '../config/config.php';
+// $_SESSION['admin_logged_in'] = true;
 
 if (isset($_SESSION['admin_logged_in'])) {
     header("Location: ../dashboard/index.php");
@@ -8,30 +10,32 @@ if (isset($_SESSION['admin_logged_in'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = htmlspecialchars($_POST['username']);
-    $password = htmlspecialchars($_POST['password']);
+    $username = $_POST['username'];
+    $password = $_POST['password'];
 
-    try {
-        $stmt = $pdo->prepare("SELECT * FROM admin WHERE username = :username");
-        $stmt->bindParam(':username', $username);
-        $stmt->execute();
-        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Check other admins (plain password)
+    $stmt = $pdo->prepare("SELECT * FROM new_admins WHERE name = ? AND password = ?");
+    $stmt->execute([$username, $password]);
+    $admin1 = $stmt->fetch(PDO::FETCH_ASSOC);
+    print_r("admin");
+    if ($admin1) {
+        $_SESSION['username'] = $username;
+        $_SESSION['admin_logged_in'] = true;
+        $_SESSION['is_other_admin'] = true;
+        $_SESSION['admin_id'] = $admin1['id'];
+        // print_r($_SESSION);
+        // exit;
 
-
-        if ($admin && password_verify($password, $admin['password'])) {
-            $_SESSION['admin_logged_in'] = true;
-            $_SESSION['admin_id'] = $admin['admin_id'];
-            $_SESSION['username'] = $admin['username'];
-            header("Location: ../dashboard/index.php");
-            exit;
-        } else {
-            $error = "Invalid username or password.";
-        }
-    } catch (PDOException $e) {
-        $error = "Error: " . $e->getMessage();
+        header('Location: ../dashboard/index.php');
+        exit;
+    } else {
+        // header('Location: login.php?error=1');
+        // exit;
     }
 }
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -45,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body class="login-body">
     <div class="login-container">
-        <h1 class="login-title">Admin Login</h1>
+        <h1 class="login-title">Other Admin Login</h1>
         <?php if (isset($error)) echo "<p class='login-error'>$error</p>"; ?>
         <form method="POST" class="login-form">
             <div class="form-group">
@@ -58,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="password" id="password" name="password" class="login-input" required>
             </div>
 
-            <span>If you not Main Admin<a href="other_login.php">click here</a></span>
+            <span>If you Main Admin<a href="login.php">click here</a></span>
 
             <button type="submit" class="login-btn">Login</button>
         </form>

@@ -16,6 +16,7 @@ try {
             o.district,
             o.status,
             o.created_at,
+            o.payment_method,
             GROUP_CONCAT(p.name SEPARATOR '<br>') AS product_names,
             GROUP_CONCAT(oi.size SEPARATOR '<br>') AS sizes,
             GROUP_CONCAT(oi.quantity SEPARATOR '<br>') AS quantities
@@ -48,6 +49,7 @@ try {
                 <td>{$order['district']}</td>
                 <td>{$order['status']}</td>
                 <td>{$order['created_at']}</td>
+                <td>{$order['payment_method']}</td>
             </tr>";
         }
     } else {
