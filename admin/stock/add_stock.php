@@ -108,20 +108,105 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $stock_id ? 'Edit Stock' : 'Add Stock' ?></title>
-    <link rel="stylesheet" href="../assets/css/stock.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Font Awesome for Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background: #f4f6fb; }
+        .sidebar {
+            min-width: 220px;
+            background: #212529;
+            color: #fff;
+            min-height: 100vh;
+        }
+        .sidebar h2 {
+            padding: 1.5rem 1rem 1rem 1rem;
+            font-size: 1.5rem;
+            border-bottom: 1px solid #343a40;
+        }
+        .sidebar nav a {
+            display: block;
+            color: #adb5bd;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+        }
+        .sidebar nav a.active, .sidebar nav a:hover {
+            background: #343a40;
+            color: #fff;
+        }
+        .main-content {
+            padding: 2.5rem 2rem;
+            flex: 1;
+        }
+        .card {
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.09);
+            margin-bottom: 2rem;
+            background: #fff;
+            border: none;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .form-control, .form-select {
+            border-radius: 0.5rem;
+            border: 1px solid #e9ecef;
+            background: #f8fafc;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.15rem rgba(0,123,255,.15);
+        }
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .btn-primary, .btn-outline-primary {
+            border-radius: 0.5rem;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
+            border: none;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(90deg, #0056b3 0%, #007bff 100%);
+        }
+        .btn-outline-primary {
+            border: 1.5px solid #007bff;
+            color: #007bff;
+        }
+        .btn-outline-primary:hover {
+            background: #007bff;
+            color: #fff;
+        }
+        .investor-entry {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .investor-entry label {
+            min-width: 120px;
+            margin-bottom: 0;
+        }
+        @media (max-width: 991px) {
+            .main-content { padding: 1rem; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { min-width: 100px; }
+            .main-content { padding: 0.5rem; }
+            .card { padding: 1rem; }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
+    <div class="d-flex">
         <aside class="sidebar">
             <h2>Admin Panel</h2>
             <nav>
@@ -179,73 +264,93 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </nav>
         </aside>
         <main class="main-content">
-            <header>
-                <h1><?= $stock_id ? 'Edit Stock' : 'Add Stock' ?></h1>
-            </header>
-
-            <section class="add-stock">
+            <div class="card p-4 mb-4">
+                <h4 class="mb-3"><?= $stock_id ? 'Edit Stock' : 'Add Stock' ?></h4>
                 <?php if ($error): ?>
-                    <p class="error"><?= htmlspecialchars($error) ?></p>
+                    <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
                 <?php endif; ?>
                 <?php if ($success): ?>
-                    <p class="success"><?= htmlspecialchars($success) ?></p>
+                    <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
                 <?php endif; ?>
 
                 <form method="POST" action="">
-                    <label for="stock_name"><i class="fas fa-box"></i> Stock Name:</label>
-                    <input type="text" id="stock_name" name="stock_name" value="<?= htmlspecialchars($stock['stock_name'] ?? '') ?>" required>
+                    <div class="form-group">
+                        <label for="stock_name" class="form-label"><i class="fas fa-box"></i> Stock Name:</label>
+                        <input type="text" id="stock_name" name="stock_name" class="form-control" value="<?= htmlspecialchars($stock['stock_name'] ?? '') ?>" required>
+                    </div>
 
-                    <label for="purchase_date"><i class="fas fa-calendar-alt"></i> Purchase Date:</label>
-                    <input type="date" id="purchase_date" name="purchase_date" value="<?= htmlspecialchars($stock['purchase_date'] ?? '') ?>" required>
+                    <div class="form-group">
+                        <label for="purchase_date" class="form-label"><i class="fas fa-calendar-alt"></i> Purchase Date:</label>
+                        <input type="date" id="purchase_date" name="purchase_date" class="form-control" value="<?= htmlspecialchars($stock['purchase_date'] ?? '') ?>" required>
+                    </div>
 
-                    <label for="amount_purchased"><i class="fas fa-boxes"></i> Amount Purchased:</label>
-                    <input type="number" id="amount_purchased" name="amount_purchased" value="<?= htmlspecialchars($stock['amount_purchased'] ?? '') ?>" required>
+                    <div class="form-group">
+                        <label for="amount_purchased" class="form-label"><i class="fas fa-boxes"></i> Amount Purchased:</label>
+                        <input type="number" id="amount_purchased" name="amount_purchased" class="form-control" value="<?= htmlspecialchars($stock['amount_purchased'] ?? '') ?>" required>
+                    </div>
 
-                    <label for="purchase_price"><i class="fas fa-dollar-sign"></i> Purchase Price (per unit) (Rs.):</label>
-                    <input type="number" step="0.01" id="purchase_price" name="purchase_price" value="<?= htmlspecialchars($stock['purchase_price'] ?? '') ?>" required>
+                    <div class="form-group">
+                        <label for="purchase_price" class="form-label"><i class="fas fa-dollar-sign"></i> Purchase Price (per unit) (Rs.):</label>
+                        <input type="number" step="0.01" id="purchase_price" name="purchase_price" class="form-control" value="<?= htmlspecialchars($stock['purchase_price'] ?? '') ?>" required>
+                    </div>
 
-                    <label for="selling_price"><i class="fas fa-tag"></i> Selling Price (per unit) (Rs.):</label>
-                    <input type="number" step="0.01" id="selling_price" name="selling_price" value="<?= htmlspecialchars($stock['selling_price'] ?? '') ?>" required>
+                    <div class="form-group">
+                        <label for="selling_price" class="form-label"><i class="fas fa-tag"></i> Selling Price (per unit) (Rs.):</label>
+                        <input type="number" step="0.01" id="selling_price" name="selling_price" class="form-control" value="<?= htmlspecialchars($stock['selling_price'] ?? '') ?>" required>
+                    </div>
 
-                    <h3><i class="fas fa-users"></i> Investor Details</h3>
+                    <h3 class="mt-4"><i class="fas fa-users"></i> Investor Details</h3>
                     <div id="investors-container">
                         <?php if ($investor_details): ?>
                             <?php foreach ($investor_details as $investor): ?>
                                 <div class="investor-entry">
-                                    <label>Investor Name:</label>
-                                    <input type="text" name="investor_name[]" value="<?= htmlspecialchars($investor['investor_name'] ?? '') ?>" required>
-                                    <label>Amount Invested (Rs.):</label>
-                                    <input type="number" step="0.01" name="amount_invested[]" value="<?= htmlspecialchars($investor['amount_invested'] ?? '') ?>" required>
+                                    <div class="form-group flex-fill">
+                                        <label class="form-label">Investor Name:</label>
+                                        <input type="text" name="investor_name[]" class="form-control" value="<?= htmlspecialchars($investor['investor_name'] ?? '') ?>" required>
+                                    </div>
+                                    <div class="form-group flex-fill">
+                                        <label class="form-label">Amount Invested (Rs.):</label>
+                                        <input type="number" step="0.01" name="amount_invested[]" class="form-control" value="<?= htmlspecialchars($investor['amount_invested'] ?? '') ?>" required>
+                                    </div>
                                 </div>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <div class="investor-entry">
-                                <label>Investor Name:</label>
-                                <input type="text" name="investor_name[]" required>
-                                <label>Amount Invested (Rs.):</label>
-                                <input type="number" step="0.01" name="amount_invested[]" required>
+                                <div class="form-group flex-fill">
+                                    <label class="form-label">Investor Name:</label>
+                                    <input type="text" name="investor_name[]" class="form-control" required>
+                                </div>
+                                <div class="form-group flex-fill">
+                                    <label class="form-label">Amount Invested (Rs.):</label>
+                                    <input type="number" step="0.01" name="amount_invested[]" class="form-control" required>
+                                </div>
                             </div>
                         <?php endif; ?>
                     </div>
-                    <button type="button" id="add-investor-button"><i class="fas fa-plus-circle"></i> Add Another Investor</button>
-                    <button type="button" id="undo-investor-button"><i class="fas fa-minus-circle"></i> Undo Last Investor</button>
+                    <button type="button" id="add-investor-button" class="btn btn-outline-primary mt-3"><i class="fas fa-plus-circle"></i> Add Another Investor</button>
+                    <button type="button" id="undo-investor-button" class="btn btn-outline-danger mt-3"><i class="fas fa-minus-circle"></i> Undo Last Investor</button>
 
-                    <button type="submit"><i class="fas fa-save"></i> <?= $stock_id ? 'Update Stock' : 'Add Stock' ?></button>
+                    <button type="submit" class="btn btn-primary mt-4"><i class="fas fa-save"></i> <?= $stock_id ? 'Update Stock' : 'Add Stock' ?></button>
                 </form>
-            </section>
+            </div>
         </main>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
             // Add new investor
             $('#add-investor-button').on('click', function () {
                 const newInvestor = `
                     <div class="investor-entry">
-                        <label>Investor Name:</label>
-                        <input type="text" name="investor_name[]" placeholder="Enter investor's name" required>
-                        <label>Amount Invested (Rs.):</label>
-                        <input type="number" step="0.01" name="amount_invested[]" placeholder="Enter amount invested" required>
+                        <div class="form-group flex-fill">
+                            <label class="form-label">Investor Name:</label>
+                            <input type="text" name="investor_name[]" class="form-control" placeholder="Enter investor's name" required>
+                        </div>
+                        <div class="form-group flex-fill">
+                            <label class="form-label">Amount Invested (Rs.):</label>
+                            <input type="number" step="0.01" name="amount_invested[]" class="form-control" placeholder="Enter amount invested" required>
+                        </div>
                     </div>`;
                 $('#investors-container').append(newInvestor);
             });

@@ -34,18 +34,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
 
             $stmt = $pdo->prepare("
-                INSERT INTO reseller (name, account_details, contact_No, category, price, profit,  co_code) 
-                VALUES (:name, :account_details, :contact_No, :category, :price, :profit,  :co_code)
+                INSERT INTO reseller (name, account_details, contact_No, contact_No2, category, price, profit, co_code) 
+                VALUES (:name, :account_details, :contact_No, :contact_No2, :category, :price, :profit, :co_code)
             ");
             $stmt->execute([
                 ':name' => $name,
                 ':account_details' => $account_details,
                 ':contact_No' => $contact,
-                ':phone_number' => $contact2,
+                ':contact_No2' => $contact2,
                 ':category' => $category,
                 ':price' => $price,
                 ':profit' => $profit,
-                
                 ':co_code' => $co_codes_json
             ]);
 
@@ -111,11 +110,15 @@ if (empty($error)) {
                     <label for="contactno"><i class="fas fa-tag"></i> Phone Number 1</label>
                     <input type="number" id="contactno" name="contactno" placeholder="Enter Contact No" required>
                 </div>
+                <div class="form-group">
+                    <label for="contactno2"><i class="fas fa-tag"></i> Phone Number 2</label>
+                    <input type="number" id="contactno2" name="contactno2" placeholder="Enter Contact No 2">
+                </div>
                 
-                <!-- <div class="form-group">
+                 <!-- <div class="form-group">
                 <label for="quantities"><i class="fas fa-box-open"></i> Stock (Size and Quantity)</label>
                 <div id="stock-container"></div>
-            </div>
+            </div> -->
                 <div class="form-group">
                     <label for="price"><i class="fas fa-tag"></i> Resale Price</label>
                     <input type="number" id="price" name="price" placeholder="Enter Price" required>

@@ -361,6 +361,148 @@ $courierTodayProfit -= $courierRefundToday['refund_profit'] ?? 0;
     <link rel="stylesheet" href="../assets/css/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Products by Country Section Styles */
+        .country-products-section {
+            margin-top: 50px;
+            background: #f8fafd;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(44, 62, 80, 0.08);
+            padding: 32px 24px;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .country-products-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2d3436;
+            margin-bottom: 24px;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .country-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(52, 152, 219, 0.07);
+            margin-bottom: 18px;
+            transition: box-shadow 0.2s;
+            overflow: hidden;
+            border-left: 6px solid #2980b9;
+        }
+
+        .country-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 24px;
+            cursor: pointer;
+            background: linear-gradient(90deg, #e3f0fc 0%, #f8fafd 100%);
+        }
+
+        .country-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2980b9;
+            letter-spacing: 0.5px;
+        }
+
+        .country-quantity {
+            font-size: 1rem;
+            color: #636e72;
+            margin-left: 18px;
+            font-weight: 500;
+        }
+
+        .country-card-arrow {
+            font-size: 1.3rem;
+            color: #636e72;
+            transition: transform 0.2s;
+        }
+
+        .country-card.open .country-card-arrow {
+            transform: rotate(90deg);
+        }
+
+        .country-card-body {
+            display: none;
+            padding: 20px 32px 24px 32px;
+            background: #f4f9fd;
+            border-top: 1px solid #e1e8ed;
+            animation: fadeIn 0.3s;
+        }
+
+        .country-card.open .country-card-body {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .code-select-label {
+            font-weight: 500;
+            color: #34495e;
+            margin-right: 10px;
+        }
+
+        .code-select,
+        .size-select {
+            padding: 7px 14px;
+            border-radius: 6px;
+            border: 1px solid #b2bec3;
+            background: #fff;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            margin-right: 10px;
+            transition: border 0.2s;
+        }
+
+        .code-select:focus,
+        .size-select:focus {
+            border: 1.5px solid #2980b9;
+            outline: none;
+        }
+
+        .sizes-list {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .size-badge {
+            background: #dff9fb;
+            color: #130f40;
+            border-radius: 8px;
+            padding: 6px 14px;
+            font-size: 0.98rem;
+            font-weight: 500;
+            box-shadow: 0 1px 4px rgba(41, 128, 185, 0.07);
+            margin-bottom: 6px;
+        }
+
+        @media (max-width: 700px) {
+            .country-products-section {
+                padding: 12px 2vw;
+            }
+
+            .country-card-header,
+            .country-card-body {
+                padding: 12px 8px;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -513,7 +655,7 @@ $courierTodayProfit -= $courierRefundToday['refund_profit'] ?? 0;
     </div>
 </section>
 
-            <section class="expenses-table" style="margin-top: 50px;">
+            <!-- <section class="expenses-table" style="margin-top: 50px;">
                 <h2>Expense Records</h2>
 
                 <h3>Expenses (1-15)</h3>
@@ -571,46 +713,39 @@ $courierTodayProfit -= $courierRefundToday['refund_profit'] ?? 0;
                         <?php endif; ?>
                     </tbody>
                 </table>
-            </section>
+            </section> -->
 
-            <section class="country-products-table" style="margin-top: 50px;">
-                <h2>Products by Country</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Country</th>
-                            <th>Total Quantity</th>
-                            <th>Buying Price Codes</th>
-                            <th>Sizes and Quantities</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($countryProducts as $countryProduct): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($countryProduct['origin_country']) ?></td>
-                                <td><?= htmlspecialchars($countryProduct['total_quantity']) ?></td>
-                                <td>
-                                    <button onclick="toggleCodes('<?= htmlspecialchars($countryProduct['origin_country']) ?>')">Show Codes</button>
-                                    <div id="codes-<?= htmlspecialchars($countryProduct['origin_country']) ?>" style="display: none;">
-                                        <?php if (isset($countryData[$countryProduct['origin_country']])): ?>
-                                            <select onchange="showSizes(this, '<?= htmlspecialchars($countryProduct['origin_country']) ?>')">
-                                                <option value="">Select Code</option>
-                                                <?php foreach ($countryData[$countryProduct['origin_country']] as $code => $sizes): ?>
-                                                    <option value="<?= htmlspecialchars($code) ?>"><?= htmlspecialchars($code) ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        <?php else: ?>
-                                            No codes available
-                                        <?php endif; ?>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div id="sizes-<?= htmlspecialchars($countryProduct['origin_country']) ?>"></div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+            <section class="country-products-section">
+                <div class="country-products-title">Products by Country</div>
+                <?php foreach ($countryProducts as $countryProduct): 
+                    $country = htmlspecialchars($countryProduct['origin_country']);
+                    $totalQty = htmlspecialchars($countryProduct['total_quantity']);
+                    $codes = isset($countryData[$country]) ? array_keys($countryData[$country]) : [];
+                ?>
+                    <div class="country-card" id="country-card-<?= $country ?>">
+                        <div class="country-card-header" onclick="toggleCountryCard('<?= $country ?>')">
+                            <span>
+                                <span class="country-name"><?= $country ?></span>
+                                <span class="country-quantity">Total: <?= $totalQty ?> units</span>
+                            </span>
+                            <span class="country-card-arrow">&#9654;</span>
+                        </div>
+                        <div class="country-card-body">
+                            <?php if ($codes): ?>
+                                <label class="code-select-label" for="code-select-<?= $country ?>">Buying Price Code:</label>
+                                <select class="code-select" id="code-select-<?= $country ?>" onchange="showSizesNew(this, '<?= $country ?>')">
+                                    <option value="">Select Code</option>
+                                    <?php foreach ($codes as $code): ?>
+                                        <option value="<?= htmlspecialchars($code) ?>"><?= htmlspecialchars($code) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div id="sizes-list-<?= $country ?>"></div>
+                            <?php else: ?>
+                                <div style="color:#e74c3c; font-weight:500;">No codes available</div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
             </section>
         </main>
     </div>
@@ -713,36 +848,38 @@ $courierTodayProfit -= $courierRefundToday['refund_profit'] ?? 0;
     </script>
 
     <script>
-        function toggleCodes(country) {
-            const codesDiv = document.getElementById(`codes-${country}`);
-            if (codesDiv.style.display === 'none') {
-                codesDiv.style.display = 'block';
-            } else {
-                codesDiv.style.display = 'none';
-            }
+        // Toggle country card open/close
+        function toggleCountryCard(country) {
+            const card = document.getElementById('country-card-' + country);
+            card.classList.toggle('open');
         }
 
-        function showSizes(select, country) {
+        // Show sizes for selected code, new UI
+        function showSizesNew(select, country) {
             const code = select.value;
-            const sizesDiv = document.getElementById(`sizes-${country}`);
+            const sizesDiv = document.getElementById('sizes-list-' + country);
             sizesDiv.innerHTML = '';
 
             if (code) {
-                const sizes = <?= json_encode($countryData) ?>[country][code];
-                const sizeSelect = document.createElement('select');
-                sizeSelect.innerHTML = '<option value="">Select Size</option>';
-
-                for (const size in sizes) {
-                    const option = document.createElement('option');
-                    option.value = size;
-                    option.textContent = `Size ${size}: ${sizes[size]} units`;
-                    sizeSelect.appendChild(option);
+                const countryData = <?= json_encode($countryData) ?>;
+                const sizes = countryData[country][code];
+                if (sizes && Object.keys(sizes).length > 0) {
+                    const sizesList = document.createElement('div');
+                    sizesList.className = 'sizes-list';
+                    for (const size in sizes) {
+                        const badge = document.createElement('span');
+                        badge.className = 'size-badge';
+                        badge.textContent = `Size ${size}: ${sizes[size]} units`;
+                        sizesList.appendChild(badge);
+                    }
+                    sizesDiv.appendChild(sizesList);
+                } else {
+                    sizesDiv.innerHTML = '<span style="color:#e67e22;">No sizes available for this code.</span>';
                 }
-
-                sizesDiv.appendChild(sizeSelect);
             }
         }
     </script>
+
     // Script to handle order request card click and modal display
     <script>
         document.getElementById('orderRequestCard').onclick = function() {

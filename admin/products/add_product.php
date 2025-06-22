@@ -124,7 +124,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -132,12 +131,174 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Product</title>
-    <link rel="stylesheet" href="../assets/css/add_product.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f4f6fb;
+        }
+
+        .sidebar {
+            min-width: 220px;
+            background: #212529;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .sidebar h2 {
+            padding: 1.5rem 1rem 1rem 1rem;
+            font-size: 1.5rem;
+            border-bottom: 1px solid #343a40;
+        }
+
+        .sidebar nav a {
+            display: block;
+            color: #adb5bd;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .sidebar nav a.active,
+        .sidebar nav a:hover {
+            background: #343a40;
+            color: #fff;
+        }
+
+        .main-content {
+            padding: 2.5rem 2rem;
+            flex: 1;
+        }
+
+        .title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            font-weight: 700;
+            color: #212529;
+        }
+
+        .title a {
+            margin-left: auto;
+            font-size: 1rem;
+        }
+
+        .card {
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.09);
+            margin-bottom: 2rem;
+            background: #fff;
+            border: none;
+        }
+
+        .alert {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 0.5rem;
+            border: 1px solid #e9ecef;
+            background: #f8fafc;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.15rem rgba(0, 123, 255, .15);
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .btn-primary,
+        .btn-outline-primary {
+            border-radius: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(90deg, #0056b3 0%, #007bff 100%);
+        }
+
+        .btn-outline-primary {
+            border: 1.5px solid #007bff;
+            color: #007bff;
+        }
+
+        .btn-outline-primary:hover {
+            background: #007bff;
+            color: #fff;
+        }
+
+        .size-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.5rem;
+        }
+
+        .size-group label {
+            min-width: 80px;
+            margin-bottom: 0;
+        }
+
+        .alert-error {
+            background: #ffeaea;
+            color: #b71c1c;
+            border: 1px solid #f5c6cb;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+        }
+
+        .alert-success {
+            background: #e8f5e9;
+            color: #1b5e20;
+            border: 1px solid #c3e6cb;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+        }
+
+        @media (max-width: 991px) {
+            .main-content {
+                padding: 1rem;
+            }
+
+            .title {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                min-width: 100px;
+            }
+
+            .main-content {
+                padding: 0.5rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container">
+    <div class="d-flex">
         <aside class="sidebar">
             <h2>Admin Panel</h2>
             <nav>
@@ -194,74 +355,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <a href="../auth/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </nav>
         </aside>
-        
         <div class="main-content">
             <div class="title">
-                <h1><i class="fas fa-plus-circle"></i> Add New Product</h1>
-                <div>
-                    <a href="P_P.php"><i class="fas fa-key"></i> Enter Code</a>
-                    <a href="../products/manage_products.php"><i class="fas fa-boxes"></i> Manage Products</a>
+                <i class="fas fa-plus-circle"></i> Add New Product
+                <div class="ms-auto">
+                    <a href="P_P.php" class="btn btn-outline-secondary btn-sm"><i class="fas fa-key"></i> Enter Code</a>
+                    <a href="manage_products.php" class="btn btn-outline-primary btn-sm"><i class="fas fa-boxes"></i> Manage Products</a>
                 </div>
             </div>
-            <form class="addpro" action="" method="POST" enctype="multipart/form-data">
-                <?php if ($error): ?>
-                    <div class="alert alert-error"><i class="fas fa-exclamation-triangle"></i> <?= htmlspecialchars($error) ?></div>
-                <?php endif; ?>
-                <?php if ($success): ?>
-                    <div class="alert alert-success"><i class="fas fa-check-circle"></i> <?= htmlspecialchars($success) ?></div>
-                <?php endif; ?>
+            <div class="card p-4">
+                <form action="" method="POST" enctype="multipart/form-data">
+                    <?php if ($error): ?>
+                        <div class="alert alert-error"><i class="fas fa-exclamation-triangle"></i> <?= htmlspecialchars($error) ?></div>
+                    <?php endif; ?>
+                    <?php if ($success): ?>
+                        <div class="alert alert-success"><i class="fas fa-check-circle"></i> <?= htmlspecialchars($success) ?></div>
+                    <?php endif; ?>
 
-                <div class="form-group">
-                    <label for="buying_price_code"><i class="fas fa-dollar-sign"></i> Buying Price (Code)</label>
-                    <input type="text" id="buying_price_code" name="buying_price_code" required>
-                </div>
-                <div class="form-group">
-                    <label for="name"><i class="fas fa-box"></i> Product Name</label>
-                    <input type="text" id="name" name="name" placeholder="Enter product name" required>
-                </div>
-                <div class="form-group">
-                    <label for="description"><i class="fas fa-align-left"></i> Description</label>
-                    <textarea id="description" name="description" rows="4" placeholder="Enter product description" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="price"><i class="fas fa-tag"></i> Price (Rs.)</label>
-                    <input type="number" id="price" name="price" step="0.01" placeholder="Enter price" required>
-                </div>
-                <div class="form-group">
-                    <label for="origin_country"><i class="fas fa-flag"></i> Origin Country</label>
-                    <select id="origin_country" name="origin_country" required>
-                        <option value="">Select Country</option>
-                        <option value="Local">Local</option>
-                        <option value="Vietnam">Vietnam</option>
-                        <option value="China">China</option>
-                        <option value="India">India</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="category"><i class="fas fa-list-alt"></i> Category</label>
-                    <select id="category" name="category" required onchange="updateSizes()">
-                        <option value="">Select Category</option>
-                        <option value="Gents">Gents</option>
-                        <option value="Ladies">Ladies</option>
-                        <option value="Kids">Kids</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="quantities"><i class="fas fa-box-open"></i> Stock (Size and Quantity)</label>
-                    <div id="stock-container"></div>
-                </div>
-                <div class="form-group">
-                    <label for="image_url"><i class="fas fa-image"></i> Product Image</label>
-                    <input type="file" id="image_url" name="image_url" accept="image/*" required>
-                </div>
-                <div class="form-group">
-                    <label for="image_url"><i class="fas fa-image"></i> Other Image</label>
-                    <input type="file" id="other_images" name="other_images[]" accept="image/*" required multiple>
-                </div>
-                <button type="submit"><i class="fas fa-save"></i> Add Product</button>
-            </form>
+                    <div class="form-group">
+                        <label for="buying_price_code" class="form-label"><i class="fas fa-dollar-sign"></i> Buying Price (Code)</label>
+                        <input type="text" id="buying_price_code" name="buying_price_code" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="name" class="form-label"><i class="fas fa-box"></i> Product Name</label>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="Enter product name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description" class="form-label"><i class="fas fa-align-left"></i> Description</label>
+                        <textarea id="description" name="description" class="form-control" rows="4" placeholder="Enter product description" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="price" class="form-label"><i class="fas fa-tag"></i> Price (Rs.)</label>
+                        <input type="number" id="price" name="price" class="form-control" step="0.01" placeholder="Enter price" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="origin_country" class="form-label"><i class="fas fa-flag"></i> Origin Country</label>
+                        <select id="origin_country" name="origin_country" class="form-select" required>
+                            <option value="">Select Country</option>
+                            <option value="Local">Local</option>
+                            <option value="Vietnam">Vietnam</option>
+                            <option value="China">China</option>
+                            <option value="India">India</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="category" class="form-label"><i class="fas fa-list-alt"></i> Category</label>
+                        <select id="category" name="category" class="form-select" required onchange="updateSizes()">
+                            <option value="">Select Category</option>
+                            <option value="Gents">Gents</option>
+                            <option value="Ladies">Ladies</option>
+                            <option value="Kids">Kids</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantities" class="form-label"><i class="fas fa-box-open"></i> Stock (Size and Quantity)</label>
+                        <div id="stock-container"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="image_url" class="form-label"><i class="fas fa-image"></i> Product Image</label>
+                        <input type="file" id="image_url" name="image_url" class="form-control" accept="image/*" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="image_url" class="form-label"><i class="fas fa-image"></i> Other Image</label>
+                        <input type="file" id="other_images" name="other_images[]" class="form-control" accept="image/*" required multiple>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Add Product</button>
+                </form>
+            </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function updateSizes() {
             const category = document.getElementById("category").value;
@@ -287,6 +450,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const input = document.createElement("input");
                 input.type = "number";
                 input.name = `quantities[${size}]`;
+                input.class = "form-control";
                 input.placeholder = "Enter stock quantity";
                 input.min = 0; // Set minimum quantity to 0
 

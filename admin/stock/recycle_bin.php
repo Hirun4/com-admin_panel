@@ -51,19 +51,105 @@ try {
     die("Error: " . $e->getMessage());
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recycle Bin</title>
-    <link rel="stylesheet" href="../assets/css/stock.css">
-    <!-- Font Awesome for Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background: #f4f6fb; }
+        .sidebar {
+            min-width: 220px;
+            background: #212529;
+            color: #fff;
+            min-height: 100vh;
+        }
+        .sidebar h2 {
+            padding: 1.5rem 1rem 1rem 1rem;
+            font-size: 1.5rem;
+            border-bottom: 1px solid #343a40;
+        }
+        .sidebar nav a {
+            display: block;
+            color: #adb5bd;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+        }
+        .sidebar nav a.active, .sidebar nav a:hover {
+            background: #343a40;
+            color: #fff;
+        }
+        .main-content {
+            padding: 2.5rem 2rem;
+            flex: 1;
+        }
+        .card {
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.09);
+            margin-bottom: 2rem;
+            background: #fff;
+            border: none;
+        }
+        .table-container {
+            overflow-x: auto;
+            background: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        }
+        table {
+            width: 100%;
+            min-width: 900px;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: #fff;
+        }
+        thead {
+            background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
+            color: #fff;
+        }
+        th, td {
+            padding: 0.85rem 0.5rem;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+            font-size: 0.97rem;
+        }
+        th {
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+        tbody tr:hover {
+            background: #f1f3f5;
+            transition: background 0.2s;
+        }
+        .actions a {
+            margin-right: 0.5rem;
+        }
+        .btn-outline-primary, .btn-outline-danger {
+            border-radius: 0.5rem;
+        }
+        .btn-outline-primary:hover {
+            background: #007bff;
+            color: #fff;
+        }
+        .btn-outline-danger:hover {
+            background: #dc3545;
+            color: #fff;
+        }
+        @media (max-width: 1200px) {
+            table { min-width: 700px; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { min-width: 100px; }
+            .main-content { padding: 1rem; }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
+    <div class="d-flex">
         <aside class="sidebar">
             <h2>Admin Panel</h2>
             <nav>
@@ -120,55 +206,50 @@ try {
                 <a href="../auth/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </nav>
         </aside>
-
         <main class="main-content">
-            <header>
-                <h1><i class="fas fa-recycle"></i> Recycle Bin</h1>
-            </header>
-
-            <section class="stock-table">
-                <h2>Deleted Stocks</h2>
+            <div class="card p-4">
+                <h4 class="mb-3"><i class="fas fa-recycle"></i> Recycle Bin</h4>
                 <?php if (!empty($_SESSION['message'])): ?>
-                    <div class="alert">
-                        <?= $_SESSION['message']; unset($_SESSION['message']); ?>
-                    </div>
+                    <div class="alert alert-success"><?= $_SESSION['message']; unset($_SESSION['message']); ?></div>
                 <?php endif; ?>
                 <?php if (count($deletedStocks) > 0): ?>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Stock Name</th>
-                                <th>Purchase Date</th>
-                                <th>Amount Purchased</th>
-                                <th>Purchase Price (Rs.)</th>
-                                <th>Selling Price (Rs.)</th>
-                                <th>Deleted At</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($deletedStocks as $stock): ?>
+                    <div class="table-container">
+                        <table class="table align-middle">
+                            <thead>
                                 <tr>
-                                    <td><?= htmlspecialchars($stock['stock_name']) ?></td>
-                                    <td><?= htmlspecialchars($stock['purchase_date']) ?></td>
-                                    <td><?= htmlspecialchars($stock['amount_purchased']) ?></td>
-                                    <td>Rs. <?= number_format($stock['purchase_price'], 2) ?></td>
-                                    <td>Rs. <?= number_format($stock['selling_price'], 2) ?></td>
-                                    <td><?= htmlspecialchars($stock['deleted_at']) ?></td>
-                                    <td>
-                                        <a href="recycle_bin.php?restore_stock_id=<?= $stock['id'] ?>"><i class="fas fa-undo"></i> Restock</a> |
-                                        <a href="recycle_bin.php?delete_forever_stock_id=<?= $stock['id'] ?>" 
-                                           onclick="return confirm('Are you sure you want to delete this stock permanently?');"><i class="fas fa-trash"></i> Delete Forever</a>
-                                    </td>
+                                    <th>Stock Name</th>
+                                    <th>Purchase Date</th>
+                                    <th>Amount Purchased</th>
+                                    <th>Purchase Price (Rs.)</th>
+                                    <th>Selling Price (Rs.)</th>
+                                    <th>Deleted At</th>
+                                    <th>Actions</th>
                                 </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($deletedStocks as $stock): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($stock['stock_name']) ?></td>
+                                        <td><?= htmlspecialchars($stock['purchase_date']) ?></td>
+                                        <td><?= htmlspecialchars($stock['amount_purchased']) ?></td>
+                                        <td>Rs. <?= number_format($stock['purchase_price'], 2) ?></td>
+                                        <td>Rs. <?= number_format($stock['selling_price'], 2) ?></td>
+                                        <td><?= htmlspecialchars($stock['deleted_at']) ?></td>
+                                        <td>
+                                            <a href="recycle_bin.php?restore_stock_id=<?= $stock['id'] ?>" class="btn btn-outline-primary btn-sm"><i class="fas fa-undo"></i> Restock</a>
+                                            <a href="recycle_bin.php?delete_forever_stock_id=<?= $stock['id'] ?>" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure you want to delete this stock permanently?');"><i class="fas fa-trash"></i> Delete Forever</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 <?php else: ?>
                     <p>No records found in the recycle bin.</p>
                 <?php endif; ?>
-            </section>
+            </div>
         </main>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

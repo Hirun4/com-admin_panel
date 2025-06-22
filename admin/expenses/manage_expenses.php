@@ -60,11 +60,77 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expenses Table</title>
-    <link rel="stylesheet" href="../assets/css/expenses.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8fafc;
+        }
+        .sidebar {
+            min-width: 220px;
+            background: #212529;
+            color: #fff;
+            min-height: 100vh;
+        }
+        .sidebar h2 {
+            padding: 1.5rem 1rem 1rem 1rem;
+            font-size: 1.5rem;
+            border-bottom: 1px solid #343a40;
+        }
+        .sidebar nav a {
+            display: block;
+            color: #adb5bd;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+        }
+        .sidebar nav a.active, .sidebar nav a:hover {
+            background: #343a40;
+            color: #fff;
+        }
+        .main-content {
+            padding: 2rem;
+            flex: 1;
+        }
+        .top-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        .card {
+            border-radius: 1rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            margin-bottom: 2rem;
+        }
+        .table thead {
+            background: #212529;
+            color: #fff;
+        }
+        .table tbody tr:hover {
+            background: #f1f3f5;
+        }
+        .alert {
+            margin-bottom: 1rem;
+        }
+        .form-label {
+            font-weight: 500;
+        }
+        .form-control, .form-select {
+            border-radius: 0.5rem;
+        }
+        .actions a {
+            margin-right: 0.5rem;
+        }
+        @media (max-width: 768px) {
+            .sidebar { min-width: 100px; }
+            .main-content { padding: 1rem; }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
+    <div class="d-flex">
         <aside class="sidebar">
             <h2>Admin Panel</h2>
             <nav>
@@ -121,77 +187,85 @@ try {
                 <a href="../auth/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </nav>
         </aside>
-        
         <main class="main-content">
-            <div class="title">
-                <h1 class="top-bar"><i class="fas fa-file-invoice-dollar"></i> Expenses Table</h1>
-                <a href="expenses.php"><i class="fas fa-history"></i> Previous Expenses</a>
+            <div class="top-bar">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <span>Expenses Table</span>
+                <a href="expenses.php" class="btn btn-outline-secondary btn-sm ms-auto"><i class="fas fa-history"></i> Previous Expenses</a>
             </div>
-            <div class="content">
-                <h2>Add Expense</h2>
-                <?php if ($error): ?>
-                    <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
-                <?php endif; ?>
-                <?php if ($success): ?>
-                    <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
-                <?php endif; ?>
-
-                <form id="expenseForm" action="" method="POST">
-                    <div class="form-group">
-                        <label for="spender_name">Spender Name:</label>
-                        <input type="text" id="spender_name" name="spender_name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="description">Description:</label>
-                        <textarea id="description" name="description" rows="4" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="amount">Amount:</label>
-                        <input type="number" id="amount" name="amount" step="0.01" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="expense_date">Date:</label>
-                        <input type="date" id="expense_date" name="expense_date" required>
-                    </div>
-                    <button type="submit">Add Expense</button>
-                </form>
-
-                <h2>Expense Records</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Spender Name</th>
-                            <th>Description</th>
-                            <th>Amount</th>
-                            <th>Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (empty($expenses)): ?>
-                            <tr>
-                                <td colspan="5">No expenses recorded yet.</td>
-                            </tr>
-                        <?php else: ?>
-                            <?php foreach ($expenses as $expense): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($expense['spender_name']) ?></td>
-                                    <td><?= htmlspecialchars($expense['description']) ?></td>
-                                    <td>Rs. <?= number_format($expense['amount'], 2) ?></td>
-                                    <td><?= htmlspecialchars($expense['expense_date']) ?></td>
-                                    <td class="actions">
-                                        <a class="edit" href="edit_expense.php?expense_id=<?= $expense['id'] ?>"><i class="fas fa-edit"></i> Edit</a> 
-                                        <a class="delete" href="delete_expense.php?expense_id=<?= $expense['id'] ?>" onclick="return confirm('Are you sure you want to delete this expense?');"><i class="fas fa-trash-alt"></i> Delete</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
+            <div class="row">
+                <div class="col-lg-5 mb-4">
+                    <div class="card p-4">
+                        <h4 class="mb-3">Add Expense</h4>
+                        <?php if ($error): ?>
+                            <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
                         <?php endif; ?>
-                    </tbody>
-                </table>
+                        <?php if ($success): ?>
+                            <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+                        <?php endif; ?>
+                        <form id="expenseForm" action="" method="POST">
+                            <div class="mb-3">
+                                <label for="spender_name" class="form-label">Spender Name</label>
+                                <input type="text" id="spender_name" name="spender_name" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea id="description" name="description" rows="3" class="form-control" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="amount" class="form-label">Amount</label>
+                                <input type="number" id="amount" name="amount" step="0.01" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="expense_date" class="form-label">Date</label>
+                                <input type="date" id="expense_date" name="expense_date" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Add Expense</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="card p-4">
+                        <h4 class="mb-3">Expense Records</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Spender Name</th>
+                                        <th>Description</th>
+                                        <th>Amount</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (empty($expenses)): ?>
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted">No expenses recorded yet.</td>
+                                        </tr>
+                                    <?php else: ?>
+                                        <?php foreach ($expenses as $expense): ?>
+                                            <tr>
+                                                <td><?= htmlspecialchars($expense['spender_name']) ?></td>
+                                                <td><?= htmlspecialchars($expense['description']) ?></td>
+                                                <td><span class="badge bg-success">Rs. <?= number_format($expense['amount'], 2) ?></span></td>
+                                                <td><?= htmlspecialchars($expense['expense_date']) ?></td>
+                                                <td class="actions">
+                                                    <a class="btn btn-sm btn-outline-primary" href="edit_expense.php?expense_id=<?= $expense['id'] ?>"><i class="fas fa-edit"></i></a>
+                                                    <a class="btn btn-sm btn-outline-danger" href="delete_expense.php?expense_id=<?= $expense['id'] ?>" onclick="return confirm('Are you sure you want to delete this expense?');"><i class="fas fa-trash-alt"></i></a>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.getElementById('expenseForm').addEventListener('submit', function(event) {
             let spender_name = document.getElementById('spender_name').value.trim();

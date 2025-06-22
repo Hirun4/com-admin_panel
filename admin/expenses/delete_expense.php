@@ -39,3 +39,4 @@ try {
 // Redirect back to manage expenses page
 header("Location: manage_expenses.php");
 exit;
+?>

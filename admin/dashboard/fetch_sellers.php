@@ -54,7 +54,10 @@ try {
                     <input type="text" id="contact_no" name="contact_no" value="' . htmlspecialchars($reseller['contact_No']) . '" required>
                 </div>
 
-              
+                <div class="form-group">
+                    <label for="contact_no2"><i class="fas fa-phone"></i> Contact No 2</label>
+                    <input type="text" id="contact_no2" name="contact_no2" value="' . htmlspecialchars($reseller['contact_No2']) . '">
+                </div>
 
                 <div class="form-group">
                     <label for="price"><i class="fas fa-dollar-sign"></i> Price</label>

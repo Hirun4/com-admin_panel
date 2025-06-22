@@ -182,25 +182,243 @@ if (isset($_GET['fetch_buying_price_code']) && isset($_GET['co_code'])) {
     exit;
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Order</title>
-    <link rel="stylesheet" href="../assets/css/Add_Order.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background: #f4f6fb; }
+        .sidebar {
+            min-width: 220px;
+            background: #212529;
+            color: #fff;
+            min-height: 100vh;
+        }
+        .sidebar h2 {
+            padding: 1.5rem 1rem 1rem 1rem;
+            font-size: 1.5rem;
+            border-bottom: 1px solid #343a40;
+        }
+        .sidebar nav a {
+            display: block;
+            color: #adb5bd;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+        }
+        .sidebar nav a.active, .sidebar nav a:hover {
+            background: #343a40;
+            color: #fff;
+        }
+        .main-content {
+            padding: 2.5rem 2rem;
+            flex: 1;
+        }
+        .top-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+        .top-bar .btn {
+            font-size: 1rem;
+        }
+        .card {
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.09);
+            margin-bottom: 2rem;
+            background: #fff;
+            border: none;
+        }
+        .alert {
+            margin-bottom: 1rem;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .form-control, .form-select {
+            border-radius: 0.5rem;
+            border: 1px solid #e9ecef;
+            background: #f8fafc;
+            margin-bottom: 1.1rem;
+            padding: 0.7rem 1rem;
+            font-size: 1.05rem;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.15rem rgba(0,123,255,.15);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #007bff;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #e3eafc;
+            padding-bottom: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+        .product-entry {
+            border: 1.5px solid #e3eafc;
+            border-radius: 1rem;
+            padding: 1.5rem 1.2rem;
+            margin-bottom: 2rem;
+            background: #f8fafc;
+            box-shadow: 0 2px 8px rgba(0,123,255,0.04);
+        }
+        .product-entry h3 {
+            color: #0056b3;
+            font-size: 1.1rem;
+            margin-bottom: 1.2rem;
+            font-weight: 600;
+        }
+        .btn-primary, .btn-outline-primary, .add-product-btn, .submit-btn {
+            border-radius: 0.5rem;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
+            border: none;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(90deg, #0056b3 0%, #007bff 100%);
+        }
+        .btn-outline-primary {
+            border: 1.5px solid #007bff;
+            color: #007bff;
+        }
+        .btn-outline-primary:hover {
+            background: #007bff;
+            color: #fff;
+        }
+        .add-product-btn {
+            background: #17a2b8;
+            color: white;
+            margin: 15px 0;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+        }
+        .add-product-btn:hover {
+            background: #138496;
+        }
+        .remove-product-btn {
+            background-color: #dc3545;
+            color: white;
+            margin-top: 10px;
+            border: none;
+            padding: 6px 16px;
+        }
+        .remove-product-btn:hover {
+            background-color: #c82333;
+        }
+        .form-section {
+            background: #f8fafc;
+            border-radius: 1rem;
+            padding: 2rem 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 900px;
+            border-radius: 8px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover, .close:focus {
+            color: #dc3545;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .submit-btn {
+            background: linear-gradient(90deg, #28a745 0%, #218838 100%);
+            color: #fff;
+            font-size: 1.15rem;
+            padding: 0.8rem 0;
+            margin-top: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .submit-btn:hover {
+            background: linear-gradient(90deg, #218838 0%, #28a745 100%);
+        }
+        .add-product-btn {
+            background: linear-gradient(90deg, #17a2b8 0%, #138496 100%);
+            color: #fff;
+            font-weight: 600;
+            padding: 0.6rem 1.5rem;
+        }
+        .add-product-btn:hover {
+            background: linear-gradient(90deg, #138496 0%, #17a2b8 100%);
+        }
+        .remove-product-btn {
+            background: linear-gradient(90deg, #dc3545 0%, #b71c1c 100%);
+            color: #fff;
+            font-weight: 600;
+            padding: 0.5rem 1.2rem;
+        }
+        .remove-product-btn:hover {
+            background: linear-gradient(90deg, #b71c1c 0%, #dc3545 100%);
+        }
+        .alert-success {
+            background: #e8f5e9;
+            color: #1b5e20;
+            border: 1px solid #c3e6cb;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+        }
+        .alert-danger {
+            background: #ffeaea;
+            color: #b71c1c;
+            border: 1px solid #f5c6cb;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+        }
+        @media (max-width: 991px) {
+            .main-content { padding: 1rem; }
+            .top-bar { font-size: 1.2rem; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { min-width: 100px; }
+            .main-content { padding: 0.5rem; }
+            .card { padding: 1rem; }
+        }
+    </style>
     <!-- Updated script imports for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.8/purify.min.js"></script>
 </head>
-
 <body>
-    <div class="container">
-       <aside class="sidebar">
+    <div class="d-flex">
+        <aside class="sidebar">
             <h2>Admin Panel</h2>
             <nav>
                 <a href="/project/admin/dashboard/index.php" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
@@ -257,172 +475,181 @@ if (isset($_GET['fetch_buying_price_code']) && isset($_GET['co_code'])) {
             </nav>
         </aside>
         <div class="main-content">
-            <div class="title">
-                <h1 class="top-bar">Add New Order</h1>
-                <div>
-                    <a href="P_P.php"><i class="fas fa-key"></i> Enter Code</a>
-                    <a href="../orders/manage_orders.php"><i class="fas fa-clipboard-list"></i> Manage Orders</a>
+            <div class="top-bar">
+                <i class="fas fa-plus-circle"></i>
+                <span>Add New Order</span>
+                <div class="ms-auto">
+                    <a href="P_P.php" class="btn btn-outline-secondary btn-sm"><i class="fas fa-key"></i> Enter Code</a>
+                    <a href="../orders/manage_orders.php" class="btn btn-outline-primary btn-sm"><i class="fas fa-clipboard-list"></i> Manage Orders</a>
                 </div>
             </div>
-            <div class="container2">
-                <form method="POST" class="form-container" id="orderForm">
-                    <?php if ($error): ?>
-                        <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-                    <?php endif; ?>
-                    <?php if ($success): ?>
-                        <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
-                    <?php endif; ?>
+            <div class="row justify-content-center">
+                <div class="col-lg-11">
+                    <div class="card p-4">
+                        <form method="POST" class="form-container" id="orderForm">
+                            <?php if ($error): ?>
+                                <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+                            <?php endif; ?>
+                            <?php if ($success): ?>
+                                <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+                            <?php endif; ?>
+                            <div class="row">
+                                <div class="col-md-6 form-section">
+                                    <div class="section-title"><i class="fas fa-info-circle"></i> Order Details</div>
+                                    <div class="form-group">
+                                        <label for="delivery_method"><i class="fas fa-truck"></i> Delivery Method</label>
+                                        <select id="delivery_method" name="delivery_method" required>
+                                            <option value="Home" selected>Home</option>
+                                            <option value="Courier">Courier</option>
+                                        </select>
+                                    </div>
 
-                    <div class="form-group">
-                        <label for="delivery_method"><i class="fas fa-truck"></i> Delivery Method</label>
-                        <select id="delivery_method" name="delivery_method" required>
-                            <option value="Home" selected>Home</option>
-                            <option value="Courier">Courier</option>
-                        </select>
+                                    <div id="courier-fields" style="display: none;">
+                                        <div class="form-group">
+                                            <label for="tracking_number"><i class="fas fa-hashtag"></i> Tracking Number</label>
+                                            <input type="text" id="tracking_number" name="tracking_number">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="customer_name"><i class="fas fa-user"></i> Customer Name</label>
+                                            <input type="text" id="customer_name" name="customer_name">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="phone_number1"><i class="fas fa-phone"></i> Phone Number 1</label>
+                                            <input type="text" id="phone_number1" name="phone_number1">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="phone_number2"><i class="fas fa-phone"></i> Phone Number 2</label>
+                                            <input type="text" id="phone_number2" name="phone_number2">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="address"><i class="fas fa-map-marker-alt"></i> Address</label>
+                                            <textarea id="address" name="address"></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="district"><i class="fas fa-city"></i> District</label>
+                                            <input type="text" id="district" name="district">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="district"><i class="fas fa-city"></i> Payment Method</label>
+                                            <select id="delivery_method" name="payment" required>
+                                                <option value="CASH_ON_DELIVERY" selected>CASH_ON_DELIVERY</option>
+                                                <option value="BANK_TRANSFER">BANK_TRANSFER</option>
+                                        </select>
+                                        </div>
+                                    </div>
+
+                                    <div id="delivery_fee_field" style="display: none;">
+                                        <div class="form-group">
+                                            <label for="delivery_fee"><i class="fas fa-dollar-sign"></i> Delivery Fee</label>
+                                            <input type="number" id="delivery_fee" name="delivery_fee" step="0.01">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="phone_number"><i class="fas fa-phone"></i> Phone Number</label>
+                                        <input type="text" id="phone_number" name="phone_number" required onblur="checkPhoneNumber()">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="use_existing_promo"><i class="fas fa-check"></i> Use Existing Promo Price</label>
+                                        <input type="checkbox" id="use_existing_promo" name="use_existing_promo" onchange="toggleExistingPromo()">
+                                    </div>
+
+                                    <div class="form-group" id="existing_promo_price_field" style="display: none;">
+                                        <label for="existing_promo_price"><i class="fas fa-dollar-sign"></i> Existing Promo Price</label>
+                                        <input type="number" id="existing_promo_price" name="existing_promo_price" step="0.01" readonly>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="status"><i class="fas fa-info-circle"></i> Status</label>
+                                        <select id="status" name="status">
+                                            <option value="Pending">Pending</option>
+                                            <option value="Shipped">Shipped</option>
+                                            <option value="Delivered">Delivered</option>
+                                            <option value="Returned">Returned</option>
+                                        </select>
+                                    </div>
+
+                                    <div id="return_reason_field" style="display: none;">
+                                        <div class="form-group">
+                                            <label for="return_reason"><i class="fas fa-undo"></i> Return Reason</label>
+                                            <textarea id="return_reason" name="return_reason"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 form-section">
+                                    <div class="section-title"><i class="fas fa-box"></i> Order Items</div>
+                                    <div id="product-fields">
+                                        <div class="product-entry" data-index="0">
+                                            <div class="form-group">
+                                                <label for="origin_country"><i class="fas fa-globe"></i> Origin Country</label>
+                                                <select id="origin_country" name="products[0][origin_country]" onchange="updateCategories(this)" required>
+                                                    <option value="">Select Country</option>
+                                                    <?php foreach ($countries as $country): ?>
+                                                        <option value="<?= htmlspecialchars($country) ?>"><?= htmlspecialchars($country) ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="category"><i class="fas fa-tags"></i> Category</label>
+                                                <select id="category" name="products[0][category]" onchange="updateProducts(this)" required>
+                                                    <option value="">Select Category</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="product_id"><i class="fas fa-box"></i> Product</label>
+                                                <select id="product_id" name="products[0][product_id]" onchange="updateSizes(this)" required>
+                                                    <option value="">Select Product</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="size"><i class="fas fa-ruler"></i> Size</label>
+                                                <select id="size" name="products[0][size]" required>
+                                                    <option value="">Select Size</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="quantity"><i class="fas fa-sort-numeric-up"></i> Quantity</label>
+                                                <input type="number" id="quantity" name="products[0][quantity]" min="1" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="co_code_0"><i class="fas fa-dollar-sign"></i> Co Code</label>
+                                                <input type="text" id="co_code_0" name="products[0][co_code]" required onblur="fetchBuyingPrice(this)">
+                                            </div>
+                                            <div class="form-group"  style="display: none;">
+                                                <label for="buying_price_code_0"><i class="fas fa-dollar-sign"></i> Buying Price (Code)</label>
+                                                <input type="text" id="buying_price_code_0" name="products[0][buying_price_code]" readonly>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="selling_price"><i class="fas fa-dollar-sign"></i> Selling Price</label>
+                                                <input type="number" id="selling_price" name="products[0][selling_price]" step="0.01" required oninput="handleSellingPriceInput(this)">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="discount"><i class="fas fa-percent"></i> Discount</label>
+                                                <input type="number" id="discount" name="products[0][discount]" step="0.01" oninput="handleDiscountInput(this)">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="promo_price"><i class="fas fa-dollar-sign"></i> Promo Price</label>
+                                                <input type="number" id="promo_price" name="products[0][promo_price]" step="0.01" readonly>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="final_price"><i class="fas fa-dollar-sign"></i> Final Price</label>
+                                                <input type="number" id="final_price" name="products[0][final_price]" step="0.01" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="button" onclick="addProductField()" class="add-product-btn">
+                                        <i class="fas fa-plus"></i> Add Another Product
+                                    </button>
+                                </div>
+                            </div>
+                            <button type="button" onclick="showOrderSummary()" class="btn btn-primary w-100 mt-3 submit-btn">
+                                <i class="fas fa-plus"></i> Add Order
+                            </button>
+                        </form>
                     </div>
-
-                    <div id="courier-fields" style="display: none;">
-                        <div class="form-group">
-                            <label for="tracking_number"><i class="fas fa-hashtag"></i> Tracking Number</label>
-                            <input type="text" id="tracking_number" name="tracking_number">
-                        </div>
-                        <div class="form-group">
-                            <label for="customer_name"><i class="fas fa-user"></i> Customer Name</label>
-                            <input type="text" id="customer_name" name="customer_name">
-                        </div>
-                        <div class="form-group">
-                            <label for="phone_number1"><i class="fas fa-phone"></i> Phone Number 1</label>
-                            <input type="text" id="phone_number1" name="phone_number1">
-                        </div>
-                        <div class="form-group">
-                            <label for="phone_number2"><i class="fas fa-phone"></i> Phone Number 2</label>
-                            <input type="text" id="phone_number2" name="phone_number2">
-                        </div>
-                        <div class="form-group">
-                            <label for="address"><i class="fas fa-map-marker-alt"></i> Address</label>
-                            <textarea id="address" name="address"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="district"><i class="fas fa-city"></i> District</label>
-                            <input type="text" id="district" name="district">
-                        </div>
-                        <div class="form-group">
-                            <label for="district"><i class="fas fa-city"></i> Payment Method</label>
-                            <select id="delivery_method" name="payment" required>
-                                <option value="CASH_ON_DELIVERY" selected>CASH_ON_DELIVERY</option>
-                                <option value="BANK_TRANSFER">BANK_TRANSFER</option>
-                        </select>
-                        </div>
-                    </div>
-
-                    <div id="delivery_fee_field" style="display: none;">
-                        <div class="form-group">
-                            <label for="delivery_fee"><i class="fas fa-dollar-sign"></i> Delivery Fee</label>
-                            <input type="number" id="delivery_fee" name="delivery_fee" step="0.01">
-                        </div>
-                    </div>
-
-                    <div id="product-fields">
-                        <div class="product-entry" data-index="0">
-                            <div class="form-group">
-                                <label for="origin_country"><i class="fas fa-globe"></i> Origin Country</label>
-                                <select id="origin_country" name="products[0][origin_country]" onchange="updateCategories(this)" required>
-                                    <option value="">Select Country</option>
-                                    <?php foreach ($countries as $country): ?>
-                                        <option value="<?= htmlspecialchars($country) ?>"><?= htmlspecialchars($country) ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="category"><i class="fas fa-tags"></i> Category</label>
-                                <select id="category" name="products[0][category]" onchange="updateProducts(this)" required>
-                                    <option value="">Select Category</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="product_id"><i class="fas fa-box"></i> Product</label>
-                                <select id="product_id" name="products[0][product_id]" onchange="updateSizes(this)" required>
-                                    <option value="">Select Product</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="size"><i class="fas fa-ruler"></i> Size</label>
-                                <select id="size" name="products[0][size]" required>
-                                    <option value="">Select Size</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="quantity"><i class="fas fa-sort-numeric-up"></i> Quantity</label>
-                                <input type="number" id="quantity" name="products[0][quantity]" min="1" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="co_code_0"><i class="fas fa-dollar-sign"></i> Co Code</label>
-                                <input type="text" id="co_code_0" name="products[0][co_code]" required onblur="fetchBuyingPrice(this)">
-                            </div>
-                            <div class="form-group"  style="display: none;">
-                                <label for="buying_price_code_0"><i class="fas fa-dollar-sign"></i> Buying Price (Code)</label>
-                                <input type="text" id="buying_price_code_0" name="products[0][buying_price_code]" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label for="selling_price"><i class="fas fa-dollar-sign"></i> Selling Price</label>
-                                <input type="number" id="selling_price" name="products[0][selling_price]" step="0.01" required oninput="handleSellingPriceInput(this)">
-                            </div>
-                            <div class="form-group">
-                                <label for="discount"><i class="fas fa-percent"></i> Discount</label>
-                                <input type="number" id="discount" name="products[0][discount]" step="0.01" oninput="handleDiscountInput(this)">
-                            </div>
-                            <div class="form-group">
-                                <label for="promo_price"><i class="fas fa-dollar-sign"></i> Promo Price</label>
-                                <input type="number" id="promo_price" name="products[0][promo_price]" step="0.01" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label for="final_price"><i class="fas fa-dollar-sign"></i> Final Price</label>
-                                <input type="number" id="final_price" name="products[0][final_price]" step="0.01" readonly>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="phone_number"><i class="fas fa-phone"></i> Phone Number</label>
-                        <input type="text" id="phone_number" name="phone_number" required onblur="checkPhoneNumber()">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="use_existing_promo"><i class="fas fa-check"></i> Use Existing Promo Price</label>
-                        <input type="checkbox" id="use_existing_promo" name="use_existing_promo" onchange="toggleExistingPromo()">
-                    </div>
-
-                    <div class="form-group" id="existing_promo_price_field" style="display: none;">
-                        <label for="existing_promo_price"><i class="fas fa-dollar-sign"></i> Existing Promo Price</label>
-                        <input type="number" id="existing_promo_price" name="existing_promo_price" step="0.01" readonly>
-                    </div>
-
-                    <button type="button" onclick="addProductField()" class="add-product-btn">
-                        <i class="fas fa-plus"></i> Add Another Product
-                    </button>
-
-                    <div class="form-group">
-                        <label for="status"><i class="fas fa-info-circle"></i> Status</label>
-                        <select id="status" name="status">
-                            <option value="Pending">Pending</option>
-                            <option value="Shipped">Shipped</option>
-                            <option value="Delivered">Delivered</option>
-                            <option value="Returned">Returned</option>
-                        </select>
-                    </div>
-
-                    <div id="return_reason_field" style="display: none;">
-                        <div class="form-group">
-                            <label for="return_reason"><i class="fas fa-undo"></i> Return Reason</label>
-                            <textarea id="return_reason" name="return_reason"></textarea>
-                        </div>
-                    </div>
-
-                    <button type="button" onclick="showOrderSummary()" class="submit-btn">
-                        <i class="fas fa-plus"></i> Add Order
-                    </button>
-                </form>
+                </div>
             </div>
         </div>
     </div>
@@ -1317,5 +1544,4 @@ if (isset($_GET['fetch_buying_price_code']) && isset($_GET['co_code'])) {
         });
     </script>
 </body>
-
 </html>

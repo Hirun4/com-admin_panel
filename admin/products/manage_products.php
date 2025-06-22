@@ -55,7 +55,6 @@ try {
     die("Error: " . $e->getMessage());
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -63,12 +62,157 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Products</title>
-    <link rel="stylesheet" href="../assets/css/manage.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f4f6fb;
+        }
+
+        .sidebar {
+            min-width: 220px;
+            background: #212529;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .sidebar h2 {
+            padding: 1.5rem 1rem 1rem 1rem;
+            font-size: 1.5rem;
+            border-bottom: 1px solid #343a40;
+        }
+
+        .sidebar nav a {
+            display: block;
+            color: #adb5bd;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .sidebar nav a.active,
+        .sidebar nav a:hover {
+            background: #343a40;
+            color: #fff;
+        }
+
+        .main-content {
+            padding: 2.5rem 2rem;
+            flex: 1;
+        }
+
+        .title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            font-weight: 700;
+            color: #212529;
+        }
+
+        .title a {
+            margin-left: auto;
+            font-size: 1rem;
+        }
+
+        .card {
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.09);
+            margin-bottom: 2rem;
+            background: #fff;
+            border: none;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            background: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+        }
+
+        table {
+            width: 100%;
+            min-width: 900px;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: #fff;
+        }
+
+        thead {
+            background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
+            color: #fff;
+        }
+
+        th,
+        td {
+            padding: 0.85rem 0.5rem;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+            font-size: 0.97rem;
+        }
+
+        th {
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        tbody tr:hover {
+            background: #f1f3f5;
+            transition: background 0.2s;
+        }
+
+        img {
+            border-radius: 0.5rem;
+            margin-bottom: 2px;
+            border: 1px solid #e9ecef;
+            max-width: 60px;
+            max-height: 60px;
+        }
+
+        .actions a {
+            margin-right: 0.5rem;
+        }
+
+        .btn-outline-primary,
+        .btn-outline-danger {
+            border-radius: 0.5rem;
+        }
+
+        .btn-outline-primary:hover {
+            background: #007bff;
+            color: #fff;
+        }
+
+        .btn-outline-danger:hover {
+            background: #dc3545;
+            color: #fff;
+        }
+
+        @media (max-width: 1200px) {
+            table {
+                min-width: 700px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                min-width: 100px;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .title {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container">
+    <div class="d-flex">
         <aside class="sidebar">
             <h2>Admin Panel</h2>
             <nav>
@@ -127,56 +271,59 @@ try {
         </aside>
         <div class="main-content">
             <div class="title">
-                <h1><i class="fas fa-boxes"></i> Manage Products</h1>
-                <a href="add_product.php"><i class="fas fa-plus-circle"></i> Add Product</a>
+                <i class="fas fa-boxes"></i> Manage Products
+                <a href="add_product.php" class="btn btn-success btn-sm ms-auto"><i class="fas fa-plus-circle"></i> Add Product</a>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th><i class="fas fa-box"></i> Name</th>
-                        <th><i class="fas fa-tag"></i> Price (Rs.)</th>
-                        <th><i class="fas fa-warehouse"></i> Stock (Size:Quantity)</th>
-                        <th><i class="fas fa-layer-group"></i> Total Stock</th>
-                        <th><i class="fas fa-check-circle"></i> Stock Status</th>
-                        <th><i class="fas fa-list"></i> Category</th>
-                        <th><i class="fas fa-flag"></i> Origin Country</th>
-                        <th><i class="fas fa-image"></i> Image</th>
-                        <th><i class="fas fa-tools"></i> Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (!empty($products)): ?>
-                        <?php foreach ($products as $product): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($product['name']) ?></td>
-                                <td>Rs. <?= number_format($product['price'], 2) ?></td>
-                                <td><?= htmlspecialchars($product['stock_details'] ?: 'No Stock') ?></td>
-                                <td><?= htmlspecialchars($product['stock_quantity']) ?></td>
-                                <td><?= htmlspecialchars($product['stock_status']) ?></td>
-                                <td><?= htmlspecialchars($product['category']) ?></td>
-                                <td><?= htmlspecialchars($product['origin_country']) ?></td>
-                                <td>
-                                    <?php if (!empty($product['image_url'])): ?>
-                                        <img src="<?= htmlspecialchars($product['image_url']) ?>" alt="Product Image">
-                                    <?php else: ?>
-                                        No Image
-                                    <?php endif; ?>
-                                </td>
-                                <td class="actions">
-                                    <a class="edit" href="edit_product.php?product_id=<?= $product['product_id'] ?>"><i class="fas fa-edit"></i> Edit</a>
-                                    <a class="delete" href="delete_product.php?product_id=<?= $product['product_id'] ?>" onclick="return confirm('Are you sure?')"><i class="fas fa-trash-alt"></i> Delete</a>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
+            <div class="card p-4 table-container">
+                <table class="table align-middle">
+                    <thead>
                         <tr>
-                            <td colspan="9">No products found.</td>
+                            <th><i class="fas fa-box"></i> Name</th>
+                            <th><i class="fas fa-tag"></i> Price (Rs.)</th>
+                            <th><i class="fas fa-warehouse"></i> Stock (Size:Quantity)</th>
+                            <th><i class="fas fa-layer-group"></i> Total Stock</th>
+                            <th><i class="fas fa-check-circle"></i> Stock Status</th>
+                            <th><i class="fas fa-list"></i> Category</th>
+                            <th><i class="fas fa-flag"></i> Origin Country</th>
+                            <th><i class="fas fa-image"></i> Image</th>
+                            <th><i class="fas fa-tools"></i> Actions</th>
                         </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($products)): ?>
+                            <?php foreach ($products as $product): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($product['name']) ?></td>
+                                    <td>Rs. <?= number_format($product['price'], 2) ?></td>
+                                    <td><?= htmlspecialchars($product['stock_details'] ?: 'No Stock') ?></td>
+                                    <td><?= htmlspecialchars($product['stock_quantity']) ?></td>
+                                    <td><?= htmlspecialchars($product['stock_status']) ?></td>
+                                    <td><?= htmlspecialchars($product['category']) ?></td>
+                                    <td><?= htmlspecialchars($product['origin_country']) ?></td>
+                                    <td>
+                                        <?php if (!empty($product['image_url'])): ?>
+                                            <img src="<?= htmlspecialchars($product['image_url']) ?>" alt="Product Image">
+                                        <?php else: ?>
+                                            No Image
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="actions">
+                                        <a class="edit" href="edit_product.php?product_id=<?= $product['product_id'] ?>"><i class="fas fa-edit"></i> Edit</a>
+                                        <a class="delete" href="delete_product.php?product_id=<?= $product['product_id'] ?>" onclick="return confirm('Are you sure?')"><i class="fas fa-trash-alt"></i> Delete</a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="9">No products found.</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

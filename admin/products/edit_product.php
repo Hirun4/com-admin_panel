@@ -128,21 +128,136 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Product</title>
-    <link rel="stylesheet" href="../assets/css/edit.css">
-    <!-- Font Awesome for Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background: #f4f6fb; }
+        .sidebar {
+            min-width: 220px;
+            background: #212529;
+            color: #fff;
+            min-height: 100vh;
+        }
+        .sidebar h2 {
+            padding: 1.5rem 1rem 1rem 1rem;
+            font-size: 1.5rem;
+            border-bottom: 1px solid #343a40;
+        }
+        .sidebar nav a {
+            display: block;
+            color: #adb5bd;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+        }
+        .sidebar nav a.active, .sidebar nav a:hover {
+            background: #343a40;
+            color: #fff;
+        }
+        .main-content {
+            padding: 2.5rem 2rem;
+            flex: 1;
+        }
+        .title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            font-weight: 700;
+            color: #212529;
+        }
+        .title a {
+            margin-left: auto;
+            font-size: 1rem;
+        }
+        .card {
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.09);
+            margin-bottom: 2rem;
+            background: #fff;
+            border: none;
+        }
+        .alert {
+            margin-bottom: 1rem;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .form-control, .form-select {
+            border-radius: 0.5rem;
+            border: 1px solid #e9ecef;
+            background: #f8fafc;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.15rem rgba(0,123,255,.15);
+        }
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .btn-primary, .btn-outline-primary {
+            border-radius: 0.5rem;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
+            border: none;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(90deg, #0056b3 0%, #007bff 100%);
+        }
+        .btn-outline-primary {
+            border: 1.5px solid #007bff;
+            color: #007bff;
+        }
+        .btn-outline-primary:hover {
+            background: #007bff;
+            color: #fff;
+        }
+        .size-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.5rem;
+        }
+        .size-group label {
+            min-width: 80px;
+            margin-bottom: 0;
+        }
+        .alert-error {
+            background: #ffeaea;
+            color: #b71c1c;
+            border: 1px solid #f5c6cb;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+        }
+        .alert-success {
+            background: #e8f5e9;
+            color: #1b5e20;
+            border: 1px solid #c3e6cb;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+        }
+        @media (max-width: 991px) {
+            .main-content { padding: 1rem; }
+            .title { font-size: 1.2rem; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { min-width: 100px; }
+            .main-content { padding: 0.5rem; }
+            .card { padding: 1rem; }
+        }
+    </style>
 </head>
-
 <body>
-    <div class="container">
+    <div class="d-flex">
         <aside class="sidebar">
             <h2>Admin Panel</h2>
             <nav>
@@ -199,40 +314,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <a href="../auth/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </nav>
         </aside>
-        <main class="main-content">
+        <div class="main-content">
             <div class="title">
-                <h1 class="top-bar">
-                    <i class="fas fa-edit"></i> Edit Product
-                </h1>
-                <a href="../products/manage_products.php" class="active"><i class="fas fa-boxes"></i> Manage Products</a>
+                <i class="fas fa-edit"></i> Edit Product
+                <a href="manage_products.php" class="btn btn-outline-primary btn-sm ms-auto"><i class="fas fa-boxes"></i> Manage Products</a>
             </div>
-            <div class="container2">
-                <?php if ($error): ?>
-                    <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
-                <?php endif; ?>
-                <?php if ($success): ?>
-                    <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
-                <?php endif; ?>
-
+            <div class="card p-4">
                 <form action="" method="POST" enctype="multipart/form-data">
+                    <?php if ($error): ?>
+                        <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
+                    <?php endif; ?>
+                    <?php if ($success): ?>
+                        <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+                    <?php endif; ?>
+
                     <div class="form-group">
-                        <label for="name"><i class="fas fa-tag"></i> Product Name:</label>
-                        <input type="text" id="name" name="name" value="<?= htmlspecialchars($product['name']) ?>" required>
+                        <label for="name" class="form-label"><i class="fas fa-tag"></i> Product Name:</label>
+                        <input type="text" id="name" name="name" class="form-control" value="<?= htmlspecialchars($product['name']) ?>" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="description"><i class="fas fa-info-circle"></i> Description:</label>
-                        <textarea id="description" name="description" required><?= htmlspecialchars($product['description']) ?></textarea>
+                        <label for="description" class="form-label"><i class="fas fa-info-circle"></i> Description:</label>
+                        <textarea id="description" name="description" class="form-control" required><?= htmlspecialchars($product['description']) ?></textarea>
                     </div>
 
                     <div class="form-group">
-                        <label for="price"><i class="fas fa-dollar-sign"></i> Price (Rs.):</label>
-                        <input type="number" id="price" name="price" step="0.01" value="<?= htmlspecialchars($product['price']) ?>" required>
+                        <label for="price" class="form-label"><i class="fas fa-dollar-sign"></i> Price (Rs.):</label>
+                        <input type="number" id="price" name="price" class="form-control" step="0.01" value="<?= htmlspecialchars($product['price']) ?>" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="category"><i class="fas fa-tags"></i> Category:</label>
-                        <select id="category" name="category" required>
+                        <label for="category" class="form-label"><i class="fas fa-tags"></i> Category:</label>
+                        <select id="category" name="category" class="form-select" required>
                             <option value="Ladies" <?= $product['category'] === 'ladies' ? 'selected' : '' ?>>Ladies Shoes</option>
                             <option value="Kids" <?= $product['category'] === 'kids' ? 'selected' : '' ?>>Kids Shoes</option>
                             <option value="Gents" <?= $product['category'] === 'gents' ? 'selected' : '' ?>>Gents Shoes</option>
@@ -246,26 +359,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <div class="size-group">
                                     <input type="hidden" name="sizes[]" value="<?= htmlspecialchars($stock['size']) ?>">
                                     <label>Size <?= htmlspecialchars($stock['size']) ?>:</label>
-                                    <input type="number" name="quantities[]" value="<?= htmlspecialchars($stock['quantity']) ?>" required>
+                                    <input type="number" name="quantities[]" class="form-control" value="<?= htmlspecialchars($stock['quantity']) ?>" required>
                                 </div>
                             <?php endforeach; ?>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="image_url"><i class="fas fa-image"></i> Product Image:</label>
+                        <label for="image_url" class="form-label"><i class="fas fa-image"></i> Product Image:</label>
                         <?php if (!empty($product['image_url'])): ?>
-                            <img src="<?= htmlspecialchars($product['image_url']) ?>" alt="Product Image">
+                            <img src="<?= htmlspecialchars($product['image_url']) ?>" alt="Product Image" class="img-thumbnail mb-2" style="max-width: 200px;">
                         <?php endif; ?>
-                        <input type="file" id="image_url" name="image_url" accept="image/*">
+                        <input type="file" id="image_url" name="image_url" class="form-control" accept="image/*">
                     </div>
 
-                    <button type="submit"><i class="fas fa-check-circle"></i> Update Product</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-check-circle"></i> Update Product</button>
                 </form>
             </div>
-        </main>
+        </div>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // JavaScript for active sidebar link
         document.querySelectorAll('.sidebar a').forEach(function(link) {
@@ -275,5 +388,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
     </script>
 </body>
-
 </html>

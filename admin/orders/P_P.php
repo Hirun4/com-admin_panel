@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+include_once '../config/config.php';
+
 if (!isset($_SESSION['admin_logged_in'])) {
     header("Location: ../auth/login.php");
     exit;
@@ -27,17 +29,101 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enter Code</title>
-    <link rel="stylesheet" href="../assets/css/code.css">
-    <!-- Font Awesome CDN link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8fafc;
+        }
+
+        .sidebar {
+            min-width: 220px;
+            background: #212529;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .sidebar h2 {
+            padding: 1.5rem 1rem 1rem 1rem;
+            font-size: 1.5rem;
+            border-bottom: 1px solid #343a40;
+        }
+
+        .sidebar nav a {
+            display: block;
+            color: #adb5bd;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .sidebar nav a.active,
+        .sidebar nav a:hover {
+            background: #343a40;
+            color: #fff;
+        }
+
+        .main-content {
+            padding: 2rem;
+            flex: 1;
+        }
+
+        .top-bar {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            color: #212529;
+            text-align: center;
+        }
+
+        .card {
+            border-radius: 1rem;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+            margin-bottom: 2rem;
+            background: #fff;
+        }
+
+        .alert {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+        }
+
+        .form-control {
+            border-radius: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .btn-primary {
+            width: 100%;
+            font-size: 1.1rem;
+            padding: 0.75rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                min-width: 100px;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container">
+    <div class="d-flex">
         <aside class="sidebar">
             <h2>Admin Panel</h2>
             <nav>
-                <a href="/project/admin/dashboard/index.php" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="/project/admin/dashboard/index.php" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
                 <?php
                 // Main admin: show all tabs
                 if (isset($_SESSION['admin_logged_in']) && !isset($_SESSION['is_other_admin'])) {
@@ -90,33 +176,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <a href="../auth/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </nav>
         </aside>
-        
-
-        <div class="main-content">
-            <div class="content">
-                <div class="top-bar">Enter Code</div>
+        <div class="main-content d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+            <div class="card p-4" style="max-width: 400px; width: 100%;">
+                <div class="top-bar mb-4">Enter Code</div>
                 <form method="POST">
                     <?php if ($error): ?>
                         <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
                     <?php endif; ?>
                     <div class="form-group">
-                        <input type="text" id="code" name="code" placeholder="Enter Code" required>
+                        <label for="code" class="form-label"><i class="fas fa-key"></i> Code</label>
+                        <input type="text" id="code" name="code" class="form-control" placeholder="Enter Code" required>
                     </div>
-
-                    <button type="submit">Submit</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-arrow-right"></i> Submit</button>
                 </form>
             </div>
         </div>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Highlight active link in the sidebar
-        const currentPage = window.location.pathname.split('/').pop(); // Get the current page
+        const currentPage = window.location.pathname.split('/').pop();
         const sidebarLinks = document.querySelectorAll('.sidebar nav a');
-
         sidebarLinks.forEach(link => {
             if (link.href.includes(currentPage)) {
-                link.classList.add('active'); // Add 'active' class to the link of the current page
+                link.classList.add('active');
             }
         });
     </script>

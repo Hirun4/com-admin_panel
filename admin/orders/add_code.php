@@ -72,12 +72,97 @@ if (isset($_GET['fetch_buying_price_code']) && isset($_GET['co_code'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Code</title>
-    <link rel="stylesheet" href="../assets/css/code.css">
-    <!-- Font Awesome CDN link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background: #f8fafc; }
+        .sidebar {
+            min-width: 220px;
+            background: #212529;
+            color: #fff;
+            min-height: 100vh;
+        }
+        .sidebar h2 {
+            padding: 1.5rem 1rem 1rem 1rem;
+            font-size: 1.5rem;
+            border-bottom: 1px solid #343a40;
+        }
+        .sidebar nav a {
+            display: block;
+            color: #adb5bd;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+        }
+        .sidebar nav a.active, .sidebar nav a:hover {
+            background: #343a40;
+            color: #fff;
+        }
+        .main-content {
+            padding: 2rem;
+            flex: 1;
+        }
+        .top-bar {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            color: #212529;
+            text-align: center;
+        }
+        .card {
+            border-radius: 1rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            margin-bottom: 2rem;
+            background: #fff;
+        }
+        .alert {
+            margin-bottom: 1rem;
+        }
+        .form-label {
+            font-weight: 500;
+        }
+        .form-control {
+            border-radius: 0.5rem;
+        }
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .btn-primary {
+            width: 100%;
+            font-size: 1.1rem;
+            padding: 0.75rem;
+        }
+        .co-code-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.5rem;
+        }
+        .buying-price-code-input {
+            width: 180px;
+            background: #f1f3f5;
+        }
+        .add-co-btn {
+            background: #17a2b8;
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.4rem 1rem;
+            margin-top: 5px;
+            font-size: 1rem;
+        }
+        .add-co-btn:hover {
+            background: #138496;
+        }
+        @media (max-width: 768px) {
+            .sidebar { min-width: 100px; }
+            .main-content { padding: 1rem; }
+        }
+    </style>
 </head>
 <body>
-    <aside class="sidebar">
+    <div class="d-flex">
+        <aside class="sidebar">
             <h2>Admin Panel</h2>
             <nav>
                 <a href="/project/admin/dashboard/index.php" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
@@ -133,42 +218,44 @@ if (isset($_GET['fetch_buying_price_code']) && isset($_GET['co_code'])) {
                 <a href="../auth/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </nav>
         </aside>
+        <div class="main-content d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+            <div class="card p-4" style="max-width: 500px; width: 100%;">
+                <div class="top-bar mb-4">Add New Code</div>
+                <form method="POST" id="add-code-form">
+                    <?php if ($error): ?>
+                        <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+                    <?php endif; ?>
+                    <?php if ($success): ?>
+                        <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+                    <?php endif; ?>
 
-    <div class="main-content">
-        <div class="top-bar">Add New Code</div>
-        <form method="POST" id="add-code-form">
-            <?php if ($error): ?>
-                <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-            <?php endif; ?>
-            <?php if ($success): ?>
-                <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
-            <?php endif; ?>
-
-            <div class="form-group">
-                <label for="code">Code:</label>
-                <input type="text" id="code" name="code" required>
-            </div>
-
-            <div class="form-group">
-                <label for="buying_price">Buying Price:</label>
-                <input type="number" id="buying_price" name="buying_price" step="0.01" required>
-            </div>
-
-            <div class="form-group">
-                <label>Co Codes:</label>
-                <div id="co-codes-wrapper">
-                    <div class="co-code-group">
-                        <input type="text" name="co_codes[]" class="co-code-input" required>
-                        <input type="text" class="buying-price-code-input" placeholder="Buying Price Code" readonly style="margin-left:10px;">
+                    <div class="form-group">
+                        <label for="code" class="form-label"><i class="fas fa-barcode"></i> Code</label>
+                        <input type="text" id="code" name="code" class="form-control" required>
                     </div>
-                </div>
-                <button type="button" onclick="addCoCodeField()" style="margin-top:5px;">+</button>
+
+                    <div class="form-group">
+                        <label for="buying_price" class="form-label"><i class="fas fa-dollar-sign"></i> Buying Price</label>
+                        <input type="number" id="buying_price" name="buying_price" step="0.01" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-code"></i> Co Codes</label>
+                        <div id="co-codes-wrapper">
+                            <div class="co-code-group">
+                                <input type="text" name="co_codes[]" class="form-control co-code-input" placeholder="Co Code" required>
+                                <input type="text" class="form-control buying-price-code-input" placeholder="Buying Price Code" readonly>
+                            </div>
+                        </div>
+                        <button type="button" class="add-co-btn" onclick="addCoCodeField()"><i class="fas fa-plus"></i> Add Co Code</button>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary mt-2"><i class="fas fa-plus"></i> Add Code</button>
+                </form>
             </div>
-
-            <button type="submit">Add Code</button>
-        </form>
+        </div>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Highlight active link in the sidebar
         const currentPage = window.location.pathname.split('/').pop();
@@ -179,7 +266,6 @@ if (isset($_GET['fetch_buying_price_code']) && isset($_GET['co_code'])) {
             }
         });
 
-        // Add new co code field with buying price code field
         function addCoCodeField() {
             var wrapper = document.getElementById('co-codes-wrapper');
             var group = document.createElement('div');
@@ -187,16 +273,15 @@ if (isset($_GET['fetch_buying_price_code']) && isset($_GET['co_code'])) {
             var input = document.createElement('input');
             input.type = 'text';
             input.name = 'co_codes[]';
-            input.className = 'co-code-input';
+            input.className = 'form-control co-code-input';
+            input.placeholder = 'Co Code';
             input.required = true;
-            input.style.marginTop = '5px';
 
             var buyingPriceInput = document.createElement('input');
             buyingPriceInput.type = 'text';
-            buyingPriceInput.className = 'buying-price-code-input';
+            buyingPriceInput.className = 'form-control buying-price-code-input';
             buyingPriceInput.placeholder = 'Buying Price Code';
             buyingPriceInput.readOnly = true;
-            buyingPriceInput.style.marginLeft = '10px';
 
             group.appendChild(input);
             group.appendChild(buyingPriceInput);
@@ -210,7 +295,6 @@ if (isset($_GET['fetch_buying_price_code']) && isset($_GET['co_code'])) {
             input.addEventListener('blur', handleCoCodeInput);
         });
 
-        // Handle co code input blur event
         function handleCoCodeInput(e) {
             const coCode = e.target.value.trim();
             const buyingPriceInput = e.target.parentElement.querySelector('.buying-price-code-input');
@@ -232,7 +316,6 @@ if (isset($_GET['fetch_buying_price_code']) && isset($_GET['co_code'])) {
                 });
         }
 
-        // When form is loaded, attach event listeners to all co code inputs
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.co-code-input').forEach(input => {
                 input.addEventListener('blur', handleCoCodeInput);

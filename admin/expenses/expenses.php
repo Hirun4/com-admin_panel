@@ -58,12 +58,75 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expenses</title>
-    <link rel="stylesheet" href="../assets/css/expenses.css">
-    <!-- Font Awesome for Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background: #f8fafc; }
+        .sidebar {
+            min-width: 220px;
+            background: #212529;
+            color: #fff;
+            min-height: 100vh;
+        }
+        .sidebar h2 {
+            padding: 1.5rem 1rem 1rem 1rem;
+            font-size: 1.5rem;
+            border-bottom: 1px solid #343a40;
+        }
+        .sidebar nav a {
+            display: block;
+            color: #adb5bd;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+        }
+        .sidebar nav a.active, .sidebar nav a:hover {
+            background: #343a40;
+            color: #fff;
+        }
+        .main-content {
+            padding: 2rem;
+            flex: 1;
+        }
+        .top-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .card {
+            border-radius: 1rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            margin-bottom: 2rem;
+        }
+        .table thead {
+            background: #212529;
+            color: #fff;
+        }
+        .table tbody tr:hover {
+            background: #f1f3f5;
+        }
+        .section-title {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: #212529;
+        }
+        .period-title {
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            color: #495057;
+        }
+        @media (max-width: 768px) {
+            .sidebar { min-width: 100px; }
+            .main-content { padding: 1rem; }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
+    <div class="d-flex">
         <aside class="sidebar">
             <h2>Admin Panel</h2>
             <nav>
@@ -122,113 +185,119 @@ try {
         </aside>
         <main class="main-content">
             <div class="top-bar">
-                <a href="../expenses/manage_expenses.php"><i class="fas fa-chevron-left"></i>BACK</a>
-                <h1 ><i class="fas fa-file-invoice-dollar"></i> Expenses</h1>
+                <a href="../expenses/manage_expenses.php" class="btn btn-outline-secondary btn-sm"><i class="fas fa-chevron-left"></i> BACK</a>
+                <span><i class="fas fa-file-invoice-dollar"></i> Expenses</span>
             </div>
-            <div class="content1">
-                <!-- Current Month's Expenses -->
-                <h2>Current Month's Expenses (<?= date('F Y') ?>)</h2>
-                <h3>1st-15th</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th><i class="fas fa-user"></i> Spender Name</th>
-                            <th><i class="fas fa-pencil-alt"></i> Description</th>
-                            <th><i class="fas fa-money-bill-wave"></i> Amount</th>
-                            <th><i class="fas fa-calendar-day"></i> Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $found = false;
-                        foreach ($currentExpenses as $expense) {
-                            if ($expense['period'] === '1-15') {
-                                $found = true;
-                                ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($expense['spender_name']) ?></td>
-                                    <td><?= htmlspecialchars($expense['description']) ?></td>
-                                    <td>$<?= number_format($expense['amount'], 2) ?></td>
-                                    <td><?= htmlspecialchars($expense['expense_date']) ?></td>
-                                </tr>
-                                <?php
-                            }
-                        }
-                        if (!$found) {
-                            echo '<tr><td colspan="4">No expenses found for this period.</td></tr>';
-                        }
-                        ?>
-                    </tbody>
-                </table>
-                
-                <h3>16th-31st</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th><i class="fas fa-user"></i> Spender Name</th>
-                            <th><i class="fas fa-pencil-alt"></i> Description</th>
-                            <th><i class="fas fa-money-bill-wave"></i> Amount</th>
-                            <th><i class="fas fa-calendar-day"></i> Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $found = false;
-                        foreach ($currentExpenses as $expense) {
-                            if ($expense['period'] === '16-31') {
-                                $found = true;
-                                ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($expense['spender_name']) ?></td>
-                                    <td><?= htmlspecialchars($expense['description']) ?></td>
-                                    <td>$<?= number_format($expense['amount'], 2) ?></td>
-                                    <td><?= htmlspecialchars($expense['expense_date']) ?></td>
-                                </tr>
-                                <?php
-                            }
-                        }
-                        if (!$found) {
-                            echo '<tr><td colspan="4">No expenses found for this period.</td></tr>';
-                        }
-                        ?>
-                    </tbody>
-                </table>
-
-                <!-- Previous Months' Expenses -->
-                <h2>Previous Months' Expenses</h2>
-                <?php
-                $groupedExpenses = [];
-                foreach ($allPreviousExpenses as $expense) {
-                    $groupedExpenses[$expense['month']][] = $expense;
-                }
-                ?>
-                <?php if (empty($groupedExpenses)): ?>
-                    <p>No previous months' expenses found.</p>
-                <?php else: ?>
-                    <?php foreach ($groupedExpenses as $month => $expenses): ?>
-                        <h3><?= date('F Y', strtotime($month . '-01')) ?></h3>
-                        <table>
+            <div>
+                <div class="card p-4 mb-4">
+                    <h4 class="section-title">Current Month's Expenses (<?= date('F Y') ?>)</h4>
+                    <div class="period-title">1st-15th</div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-4">
                             <thead>
                                 <tr>
                                     <th><i class="fas fa-user"></i> Spender Name</th>
-                                    <th><i class="fas fa-money-bill-wave"></i> Total Amount</th>
+                                    <th><i class="fas fa-pencil-alt"></i> Description</th>
+                                    <th><i class="fas fa-money-bill-wave"></i> Amount</th>
+                                    <th><i class="fas fa-calendar-day"></i> Date</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($expenses as $expense): ?>
-                                    <tr>
-                                        <td><?= htmlspecialchars($expense['spender_name']) ?></td>
-                                        <td>$<?= number_format($expense['total_amount'], 2) ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
+                                <?php
+                                $found = false;
+                                foreach ($currentExpenses as $expense) {
+                                    if ($expense['period'] === '1-15') {
+                                        $found = true;
+                                        ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($expense['spender_name']) ?></td>
+                                            <td><?= htmlspecialchars($expense['description']) ?></td>
+                                            <td><span class="badge bg-success">Rs. <?= number_format($expense['amount'], 2) ?></span></td>
+                                            <td><?= htmlspecialchars($expense['expense_date']) ?></td>
+                                        </tr>
+                                        <?php
+                                    }
+                                }
+                                if (!$found) {
+                                    echo '<tr><td colspan="4" class="text-center text-muted">No expenses found for this period.</td></tr>';
+                                }
+                                ?>
                             </tbody>
                         </table>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                    </div>
+                    <div class="period-title">16th-31st</div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-4">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-user"></i> Spender Name</th>
+                                    <th><i class="fas fa-pencil-alt"></i> Description</th>
+                                    <th><i class="fas fa-money-bill-wave"></i> Amount</th>
+                                    <th><i class="fas fa-calendar-day"></i> Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                $found = false;
+                                foreach ($currentExpenses as $expense) {
+                                    if ($expense['period'] === '16-31') {
+                                        $found = true;
+                                        ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($expense['spender_name']) ?></td>
+                                            <td><?= htmlspecialchars($expense['description']) ?></td>
+                                            <td><span class="badge bg-success">Rs. <?= number_format($expense['amount'], 2) ?></span></td>
+                                            <td><?= htmlspecialchars($expense['expense_date']) ?></td>
+                                        </tr>
+                                        <?php
+                                    }
+                                }
+                                if (!$found) {
+                                    echo '<tr><td colspan="4" class="text-center text-muted">No expenses found for this period.</td></tr>';
+                                }
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card p-4">
+                    <h4 class="section-title">Previous Months' Expenses</h4>
+                    <?php
+                    $groupedExpenses = [];
+                    foreach ($allPreviousExpenses as $expense) {
+                        $groupedExpenses[$expense['month']][] = $expense;
+                    }
+                    ?>
+                    <?php if (empty($groupedExpenses)): ?>
+                        <p class="text-muted">No previous months' expenses found.</p>
+                    <?php else: ?>
+                        <?php foreach ($groupedExpenses as $month => $expenses): ?>
+                            <div class="period-title"><?= date('F Y', strtotime($month . '-01')) ?></div>
+                            <div class="table-responsive mb-4">
+                                <table class="table table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th><i class="fas fa-user"></i> Spender Name</th>
+                                            <th><i class="fas fa-money-bill-wave"></i> Total Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($expenses as $expense): ?>
+                                            <tr>
+                                                <td><?= htmlspecialchars($expense['spender_name']) ?></td>
+                                                <td><span class="badge bg-primary">Rs. <?= number_format($expense['total_amount'], 2) ?></span></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
             </div>
         </main>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // JavaScript for active sidebar link
         document.querySelectorAll('.sidebar a').forEach(function(link) {
