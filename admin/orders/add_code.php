@@ -27,7 +27,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $existingCode = $stmtCheck->fetch(PDO::FETCH_ASSOC);
 
             if ($existingCode) {
-                $error = 'This code already exists!';
+                if ($existingCode['buying_price'] == $buying_price) {
+                    // Merge co_codes
+                    $existingCoCodes = json_decode($existingCode['co_codes'], true) ?? [];
+                    $newCoCodes = array_map('trim', $co_codes);
+                    $mergedCoCodes = array_unique(array_merge($existingCoCodes, $newCoCodes));
+
+                    // Update the co_codes for existing code
+                    $stmtUpdate = $pdo->prepare("UPDATE product_codes SET co_codes = :co_codes WHERE code = :code");
+                    $stmtUpdate->execute([
+                        ':co_codes' => json_encode($mergedCoCodes),
+                        ':code' => $code
+                    ]);
+                    $success = 'Co Codes updated successfully for existing code!';
+                } else {
+                    $error = 'This code already exists with a different buying price!';
+                }
             } else {
                 // Insert the new code, buying price, and co_codes into the product_codes table
                 $stmtInsert = $pdo->prepare("INSERT INTO product_codes (code, buying_price, co_codes) VALUES (:code, :buying_price, :co_codes)");
@@ -65,6 +80,7 @@ if (isset($_GET['fetch_buying_price_code']) && isset($_GET['co_code'])) {
     exit;
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
